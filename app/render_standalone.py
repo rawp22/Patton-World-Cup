@@ -319,9 +319,9 @@ def render_standalone_dashboard() -> str:
     leaderboard_order = [row["user_id"] for row in result["leaderboard"]]
     matches_by_date = defaultdict(list)
     knockout_by_round = defaultdict(list)
-    for match in sorted(data["matches"], key=lambda item: (item["date"], _time_sort_key(item), item["match_id"])):
+    for match in sorted(data["matches"], key=lambda item: (_display_group_date_key(item), _time_sort_key(item), item["match_id"])):
         if match["stage"] == "group":
-            matches_by_date[match["date"]].append(match)
+            matches_by_date[_display_group_date_key(match)].append(match)
         else:
             knockout_by_round[match.get("round_label", match["stage"])].append(match)
     groups = _groups([match for match in data["matches"] if match["stage"] == "group"])
@@ -414,13 +414,28 @@ def write_standalone_dashboard(path: Path = OUTPUT_PATH) -> Path:
 
 
 
+def _kickoff_clock(match):
+    return (match.get("kickoff_et") or "99:99 ET").split()[0]
+
+
+def _is_midnight_match(match):
+    return _kickoff_clock(match) == "00:00"
+
+
+def _display_group_date_key(match):
+    date = datetime.strptime(match["date"], "%Y-%m-%d").date()
+    if _is_midnight_match(match):
+        date = date - timedelta(days=1)
+    return date.isoformat()
+
+
 def _time_sort_key(match):
-    kickoff = match.get("kickoff_et") or "99:99 ET"
-    return kickoff.split()[0]
+    kickoff = _kickoff_clock(match)
+    return "24:00" if kickoff == "00:00" else kickoff
 
 
 def _match_reveal_at(match):
-    date = datetime.strptime(match["date"], "%Y-%m-%d").date()
+    date = datetime.strptime(_display_group_date_key(match), "%Y-%m-%d").date()
     reveal = datetime.combine(date + timedelta(days=1), time(12, 0), EASTERN)
     return reveal.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
@@ -689,7 +704,7 @@ def _final_group_match_ids(group_matches):
         matches_by_group[match.get("group")].append(match)
     report_ids = set()
     for matches in matches_by_group.values():
-        final_matches = sorted(matches, key=lambda item: (item["date"], item.get("kickoff_et", ""), item["match_id"]))[-2:]
+        final_matches = sorted(matches, key=lambda item: (_display_group_date_key(item), _time_sort_key(item), item["match_id"]))[-2:]
         report_ids.update(match["match_id"] for match in final_matches)
     return report_ids
 
