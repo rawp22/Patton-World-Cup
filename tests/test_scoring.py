@@ -26,8 +26,37 @@ def test_group_dark_horse_points_stack():
 
     total = result["leaderboard"][0]
     assert total["group_points"] == 1
-    assert total["dark_horse_points"] == 4
-    assert total["total_points"] == 5
+    assert total["dark_horse_points"] == 3
+    assert total["total_points"] == 4
+
+
+def test_group_dark_horse_draw_points_apply_even_when_pick_differs():
+    matches = [
+        {
+            "match_id": "M1",
+            "stage": "group",
+            "date": "2026-06-11",
+            "team_a": "Haiti",
+            "team_b": "Brazil",
+            "result": "DRAW",
+        }
+    ]
+    users = [
+        {
+            "user_id": "u1",
+            "display_name": "User",
+            "champion": "Brazil",
+            "dark_horse": "Haiti",
+        }
+    ]
+    predictions = [{"user_id": "u1", "match_id": "M1", "prediction": "A_WIN"}]
+
+    result = calculate_scores(matches, predictions, users, [], {})
+
+    total = result["leaderboard"][0]
+    assert total["group_points"] == 0
+    assert total["dark_horse_points"] == 1
+    assert total["total_points"] == 1
 
 
 def test_knockout_and_dark_horse_points_stack():

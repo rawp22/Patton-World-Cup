@@ -162,9 +162,6 @@ def score_match_for_user(
             elif result == "DRAW":
                 points["dark_horse_points"] += 1
                 explanations.append("Dark horse group draw (+1)")
-            if predicted_result == result:
-                points["dark_horse_points"] += 1
-                explanations.append("Dark horse correct prediction bonus (+1)")
         elif match["stage"] in KNOCKOUT_STAGES and winner == dark_horse:
             points["dark_horse_points"] += 5
             explanations.append("Dark horse knockout win (+5)")
