@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from collections import defaultdict
 import base64
+from copy import deepcopy
+from datetime import datetime, time, timedelta
+import json
 from html import escape
 from itertools import product
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from app.data_store import load_all
 from app.scoring import calculate_scores
@@ -33,6 +37,8 @@ FLAG_CODE = {
 
 FLAG_BASE_URL = "../static/flags"
 ROUND_ORDER = ["Round of 32", "Round of 16", "Quarterfinals", "Semifinals", "Third Place", "Final"]
+EASTERN = ZoneInfo("America/New_York")
+UTC = ZoneInfo("UTC")
 
 
 STYLE = """
@@ -61,6 +67,9 @@ small { color:var(--muted); } .total { color:var(--gold-dark); font-weight:950; 
 .flag-wrap { display:inline-flex; align-items:center; } .flag-icon { width:24px; height:18px; object-fit:cover; border:1px solid var(--line); border-radius:3px; background:#fff; box-shadow:0 1px 2px rgb(83 61 24 / 12%); } .flag-fallback { color:var(--muted); font-size:11px; font-weight:900; }
 .key { padding:0 20px 18px; } .key summary { cursor:pointer; color:var(--gold-dark); font-weight:900; width:max-content; }
 .key ul { margin:10px 0 0; padding-left:20px; color:var(--muted); }
+.spoiler-controls { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 20px 16px; flex-wrap:wrap; color:var(--muted); }
+.spoiler-controls button, .match-update-button { background:var(--gold-soft); border-color:var(--gold); color:var(--gold-dark); }
+.spoiler-note { font-size:13px; font-weight:750; }
 .matches,.standings,.knockout { display:grid; gap:16px; }
 .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 16px; }
 button { border:1px solid var(--line); border-radius:8px; background:var(--cream); color:var(--ink); cursor:pointer; font:inherit; font-weight:800; padding:9px 12px; }
@@ -78,6 +87,10 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .impact-head { background:var(--gold-soft); color:var(--gold-dark); font-weight:950; border-top:0; }
 .impact-head:first-child { border-left:0; color:var(--muted); }
 .points { font-weight:950; } .scenario-muted { opacity:.34; color:var(--muted); font-weight:650; } .scenario-active { color:var(--gold-dark); font-weight:950; background:#fff7dc; } .impact-head.scenario-active { background:#f1cf6a; } .impact-head.scenario-muted { background:#faf3df; }
+.match-card.spoiler-hidden .scenario-muted, .match-card.spoiler-hidden .scenario-active { opacity:1; color:inherit; font-weight:950; background:transparent; }
+.match-card.spoiler-hidden .impact-head.scenario-muted, .match-card.spoiler-hidden .impact-head.scenario-active { background:var(--gold-soft); color:var(--gold-dark); }
+.result .spoiler-result { display:none; } .match-card.spoiler-hidden .result .live-result { display:none; } .match-card.spoiler-hidden .result .spoiler-result { display:inline; }
+.spoiler-action { display:none; margin:0 0 10px; } .match-card.spoiler-hidden .spoiler-action { display:block; }
 .conditions { margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fffdf7; color:var(--muted); }
 .conditions strong { color:var(--ink); }
 .standings-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; }
@@ -189,6 +202,18 @@ document.addEventListener('click', event => {
     clearFeederHighlights();
     return;
   }
+  const matchUpdate = event.target.closest('[data-update-match]');
+  if (matchUpdate) {
+    event.preventDefault();
+    revealMatch(matchUpdate.closest('.match-card'));
+    return;
+  }
+  const leaderboardUpdate = event.target.closest('[data-update-leaderboard]');
+  if (leaderboardUpdate) {
+    event.preventDefault();
+    revealLeaderboard();
+    return;
+  }
   const summary = event.target.closest('#knockout-tab .match-card summary');
   if (summary) {
     const card = summary.closest('.match-card');
@@ -218,9 +243,64 @@ document.addEventListener('toggle', event => {
   }
 }, true);
 
+function applyMatchSpoilers() {
+  const now = Date.now();
+  document.querySelectorAll('.match-card[data-result][data-reveal-at]').forEach(card => {
+    if (!card.dataset.result) return;
+    const storageKey = `matchReveal:${card.dataset.matchId}`;
+    const manuallyRevealed = localStorage.getItem(storageKey) === '1';
+    const autoRevealed = Date.parse(card.dataset.revealAt) <= now;
+    card.classList.toggle('spoiler-hidden', !(manuallyRevealed || autoRevealed));
+  });
+}
+function revealMatch(card) {
+  if (!card) return;
+  localStorage.setItem(`matchReveal:${card.dataset.matchId}`, '1');
+  card.classList.remove('spoiler-hidden');
+}
+function renderLeaderboardRows(rows) {
+  return rows.map(row => `
+<tr>
+  <td>${row.rank}</td>
+  <td>${row.user_html}</td>
+  <td class="total">${row.total_points}</td>
+  <td>${row.group_points}</td>
+  <td>${row.knockout_points}</td>
+  <td>${row.dark_horse_points}</td>
+  <td>${row.champion_points}</td>
+  <td>${row.draws}</td>
+</tr>`).join('');
+}
+function spoilerSafeLeaderboardRows() {
+  const data = window.LEADERBOARD_SNAPSHOTS || {snapshots:[{reveal_at:'baseline', rows:[]}], live:[]};
+  const now = Date.now();
+  let selected = data.snapshots[0] || {rows:[]};
+  data.snapshots.forEach(snapshot => {
+    if (snapshot.reveal_at !== 'baseline' && Date.parse(snapshot.reveal_at) <= now) selected = snapshot;
+  });
+  return selected.rows || [];
+}
+function applyLeaderboardSpoilerMode() {
+  const tbody = document.querySelector('.leaderboard-table tbody');
+  if (!tbody || !window.LEADERBOARD_SNAPSHOTS) return;
+  const revealed = localStorage.getItem('leaderboardReveal') === '1';
+  tbody.innerHTML = renderLeaderboardRows(revealed ? window.LEADERBOARD_SNAPSHOTS.live : spoilerSafeLeaderboardRows());
+  const button = document.querySelector('[data-update-leaderboard]');
+  const note = document.querySelector('[data-leaderboard-note]');
+  if (button) button.textContent = revealed ? 'Showing updated leaderboard' : 'Update leaderboard';
+  if (button) button.disabled = revealed;
+  if (note) note.textContent = revealed ? 'Live results are revealed on this device.' : 'Spoiler-free until noon ET the day after each completed match, unless updated here.';
+}
+function revealLeaderboard() {
+  localStorage.setItem('leaderboardReveal', '1');
+  applyLeaderboardSpoilerMode();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const initial = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
   showTab(document.getElementById(initial) ? initial : 'matches-tab');
+  applyMatchSpoilers();
+  applyLeaderboardSpoilerMode();
 });
 window.addEventListener('hashchange', () => {
   const target = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
@@ -239,14 +319,15 @@ def render_standalone_dashboard() -> str:
     leaderboard_order = [row["user_id"] for row in result["leaderboard"]]
     matches_by_date = defaultdict(list)
     knockout_by_round = defaultdict(list)
-    for match in sorted(data["matches"], key=lambda item: (item["date"], item["match_id"])):
+    for match in sorted(data["matches"], key=lambda item: (item["date"], _time_sort_key(item), item["match_id"])):
         if match["stage"] == "group":
             matches_by_date[match["date"]].append(match)
         else:
             knockout_by_round[match.get("round_label", match["stage"])].append(match)
     groups = _groups([match for match in data["matches"] if match["stage"] == "group"])
 
-    leaderboard_rows = "\n".join(_leaderboard_row(row, users_by_id[row["user_id"]], correct_draws[row["user_id"]]) for row in result["leaderboard"])
+    leaderboard_snapshots = _leaderboard_snapshots(data)
+    leaderboard_rows = "\n".join(_leaderboard_json_row_html(row) for row in leaderboard_snapshots["snapshots"][0]["rows"])
     group_matches = [match for match in data["matches"] if match["stage"] == "group"]
     report_match_ids = _final_group_match_ids(group_matches)
     match_sections = "\n".join(_date_section(date, matches, result["match_impacts"], leaderboard_order, report_match_ids) for date, matches in matches_by_date.items())
@@ -288,6 +369,7 @@ def render_standalone_dashboard() -> str:
           <tbody>{leaderboard_rows}</tbody>
         </table>
       </div>
+      <div class="spoiler-controls"><span class="spoiler-note" data-leaderboard-note>Spoiler-free until noon ET the day after each completed match, unless updated here.</span><button type="button" data-update-leaderboard>Update leaderboard</button></div>
       <details class="key">
         <summary>Key</summary>
         <ul>
@@ -316,6 +398,7 @@ def render_standalone_dashboard() -> str:
       <div class="knockout">{knockout_sections}</div>
     </section>
   </main>
+  <script>window.LEADERBOARD_SNAPSHOTS = {json.dumps(leaderboard_snapshots)};</script>
   <script>{SCRIPT}</script>
 </body>
 </html>"""
@@ -328,6 +411,83 @@ def write_standalone_dashboard(path: Path = OUTPUT_PATH) -> Path:
     SITE_OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     SITE_OUTPUT_PATH.write_text(html, encoding="utf-8")
     return path
+
+
+
+def _time_sort_key(match):
+    kickoff = match.get("kickoff_et") or "99:99 ET"
+    return kickoff.split()[0]
+
+
+def _match_reveal_at(match):
+    date = datetime.strptime(match["date"], "%Y-%m-%d").date()
+    reveal = datetime.combine(date + timedelta(days=1), time(12, 0), EASTERN)
+    return reveal.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+
+def _leaderboard_snapshots(data):
+    users_by_id = {user["user_id"]: user for user in data["users"]}
+    completed_reveals = sorted({
+        _match_reveal_at(match)
+        for match in data["matches"]
+        if match.get("result")
+    })
+    snapshots = [{"reveal_at": "baseline", "rows": _leaderboard_snapshot_rows(data, users_by_id, None)}]
+    for reveal_at in completed_reveals:
+        snapshots.append({"reveal_at": reveal_at, "rows": _leaderboard_snapshot_rows(data, users_by_id, reveal_at)})
+    live_result = calculate_scores(**data)
+    live_draws = _correct_draw_counts(data["matches"], data["predictions"])
+    return {
+        "snapshots": snapshots,
+        "live": _leaderboard_json_rows(live_result["leaderboard"], users_by_id, live_draws),
+    }
+
+
+def _leaderboard_snapshot_rows(data, users_by_id, reveal_at):
+    matches = []
+    for match in data["matches"]:
+        snapshot_match = deepcopy(match)
+        if snapshot_match.get("result") and (reveal_at is None or _match_reveal_at(snapshot_match) > reveal_at):
+            snapshot_match["result"] = None
+            snapshot_match["goals_a"] = None
+            snapshot_match["goals_b"] = None
+        matches.append(snapshot_match)
+    snapshot_data = dict(data)
+    snapshot_data["matches"] = matches
+    result = calculate_scores(**snapshot_data)
+    draws = _correct_draw_counts(matches, data["predictions"])
+    return _leaderboard_json_rows(result["leaderboard"], users_by_id, draws)
+
+
+def _leaderboard_json_rows(rows, users_by_id, draws):
+    output = []
+    for row in rows:
+        user = users_by_id[row["user_id"]]
+        item = {
+            "rank": row["rank"],
+            "user_html": f'<span class="user-name"><span class="flags">{_flag_pair(user.get("champion"), user.get("dark_horse"))}</span>{escape(row["display_name"])}</span>',
+            "total_points": row["total_points"],
+            "group_points": row["group_points"],
+            "knockout_points": row["knockout_points"],
+            "dark_horse_points": row["dark_horse_points"],
+            "champion_points": row["champion_points"],
+            "draws": draws[row["user_id"]],
+        }
+        output.append(item)
+    return output
+
+
+def _leaderboard_json_row_html(row):
+    return f"""<tr>
+  <td>{row["rank"]}</td>
+  <td>{row["user_html"]}</td>
+  <td class="total">{row["total_points"]}</td>
+  <td>{row["group_points"]}</td>
+  <td>{row["knockout_points"]}</td>
+  <td>{row["dark_horse_points"]}</td>
+  <td>{row["champion_points"]}</td>
+  <td>{row["draws"]}</td>
+</tr>"""
 
 
 def _leaderboard_row(row, user, draws):
@@ -435,6 +595,8 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     score = ""
     if match.get("goals_a") is not None and match.get("goals_b") is not None:
         score = f"<span>{match['goals_a']} - {match['goals_b']}</span>"
+    result_html = f'<span class="live-result">{escape(result)} {score}</span><span class="spoiler-result">Not played</span>' if match.get("result") else escape(result)
+    reveal_at = _match_reveal_at(match) if match.get("result") else ""
     scenarios = _visible_scenarios(match)
     users = _ordered_users(impacts, leaderboard_order)
     by_user_scenario = {(row["user_id"], row["scenario"]): row["total_points"] for row in impacts}
@@ -450,10 +612,15 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     stage = f"Group {escape(match.get('group', ''))}" if match["stage"] == "group" else escape(match.get("round_label", match["stage"]))
     meta_parts = [match.get("venue", "Venue TBD"), match.get("kickoff_et")]
     venue = f'<p class="venue">{escape(" · ".join(part for part in meta_parts if part))}</p>'
-    return f"""<details class="match-card" data-match-id="{escape(match["match_id"])}">
-  <summary><span class="stage">{stage}</span><span class="teams">{escape(match["team_a"])} vs {escape(match["team_b"])}</span><span class="result">{escape(result)} {score}</span></summary>
+    result_attr = escape(match.get("result") or "")
+    reveal_attr = escape(reveal_at)
+    update_button = '<div class="spoiler-action"><button type="button" class="match-update-button" data-update-match>Update this match</button></div>' if match.get("result") else ""
+    card_class = "match-card spoiler-hidden" if match.get("result") else "match-card"
+    return f"""<details class="{card_class}" data-match-id="{escape(match["match_id"])}" data-result="{result_attr}" data-reveal-at="{reveal_attr}">
+  <summary><span class="stage">{stage}</span><span class="teams">{escape(match["team_a"])} vs {escape(match["team_b"])}</span><span class="result">{result_html}</span></summary>
   <div class="impact">
     {venue}
+    {update_button}
     <div class="impact-grid" style="--scenario-count:{len(scenarios)}">
       <div class="impact-cell impact-head">User</div>
       {headers}
