@@ -30,14 +30,14 @@ def render_dashboard() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>World Cup Fantasy Dashboard</title>
+  <title>The Zebulon Cup</title>
   <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <p class="eyebrow">Deterministic scoring MVP</p>
-      <h1>World Cup Fantasy Dashboard</h1>
+      <h1>The Zebulon Cup</h1>
     </div>
     <div class="hash">Input hash<br><code>{escape(result["input_hash"][:16])}</code></div>
   </header>

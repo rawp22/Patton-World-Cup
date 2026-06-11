@@ -1,30 +1,68 @@
 [
   {
-    "user_id": "ana",
-    "display_name": "Ana",
-    "group": "Friends",
-    "champion": "Brazil",
+    "user_id": "rick",
+    "display_name": "Rick",
+    "champion": "Portugal",
+    "dark_horse": "Jordan"
+  },
+  {
+    "user_id": "renee",
+    "display_name": "Renee",
+    "champion": "France",
+    "dark_horse": "Uzbekistan"
+  },
+  {
+    "user_id": "maggie",
+    "display_name": "Maggie",
+    "champion": "Germany",
     "dark_horse": "Haiti"
   },
   {
-    "user_id": "ben",
-    "display_name": "Ben",
-    "group": "Office",
-    "champion": "France",
-    "dark_horse": "Japan"
+    "user_id": "scott",
+    "display_name": "Scott",
+    "champion": "Argentina",
+    "dark_horse": "Curacao"
   },
   {
-    "user_id": "cleo",
-    "display_name": "Cleo",
-    "group": "Friends",
-    "champion": "Argentina",
+    "user_id": "deacon",
+    "display_name": "Deacon",
+    "champion": "Spain",
+    "dark_horse": "Saudi Arabia"
+  },
+  {
+    "user_id": "bennett",
+    "display_name": "Bennett",
+    "champion": "Spain",
     "dark_horse": "New Zealand"
   },
   {
-    "user_id": "diego",
-    "display_name": "Diego",
-    "group": "Family",
+    "user_id": "callahan",
+    "display_name": "Callahan",
+    "champion": "France",
+    "dark_horse": "New Zealand"
+  },
+  {
+    "user_id": "steven",
+    "display_name": "Steven",
     "champion": "Spain",
-    "dark_horse": "Morocco"
+    "dark_horse": "Ghana"
+  },
+  {
+    "user_id": "angela",
+    "display_name": "Angela",
+    "champion": "Portugal",
+    "dark_horse": "Curacao"
+  },
+  {
+    "user_id": "jake",
+    "display_name": "Jake",
+    "champion": "Argentina",
+    "dark_horse": "Jordan"
+  },
+  {
+    "user_id": "ryan",
+    "display_name": "Ryan",
+    "champion": "France",
+    "dark_horse": "South Africa"
   }
 ]

@@ -340,14 +340,14 @@ def render_standalone_dashboard() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zebulon World Cup</title>
+  <title>The Zebulon Cup</title>
   <style>{STYLE}</style>
 </head>
 <body>
   <header class="topbar">
     <div>
       <p class="eyebrow">World Cup 2026 fantasy pool</p>
-      <h1>Zebulon World Cup</h1>
+      <h1>The Zebulon Cup</h1>
     </div>
     <div class="hash">Input hash<br><code>{escape(result["input_hash"][:16])}</code></div>
   </header>

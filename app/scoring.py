@@ -95,9 +95,10 @@ def calculate_scores(
             breakdowns.append(row)
             _add_points(totals[user_id], row)
 
+    user_order = {user["user_id"]: index for index, user in enumerate(users)}
     leaderboard = sorted(
         totals.values(),
-        key=lambda row: (-row["total_points"], row["display_name"].lower()),
+        key=lambda row: (-row["total_points"], user_order[row["user_id"]]),
     )
     _assign_ranks(leaderboard)
 
