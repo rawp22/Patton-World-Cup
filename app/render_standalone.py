@@ -89,8 +89,9 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .points { font-weight:950; } .scenario-muted { opacity:.34; color:var(--muted); font-weight:650; } .scenario-active { color:var(--gold-dark); font-weight:950; background:#fff7dc; } .impact-head.scenario-active { background:#f1cf6a; } .impact-head.scenario-muted { background:#faf3df; }
 .match-card.spoiler-hidden .scenario-muted, .match-card.spoiler-hidden .scenario-active { opacity:1; color:inherit; font-weight:950; background:transparent; }
 .match-card.spoiler-hidden .impact-head.scenario-muted, .match-card.spoiler-hidden .impact-head.scenario-active { background:var(--gold-soft); color:var(--gold-dark); }
-.result .spoiler-result { display:none; } .match-card.spoiler-hidden .result .live-result { display:none; } .match-card.spoiler-hidden .result .spoiler-result { display:inline; }
-.spoiler-action { display:none; margin:0 0 10px; } .match-card.spoiler-hidden .spoiler-action { display:block; }
+.teams .live-teams { display:none; } .match-card.revealed-result .teams .default-teams { display:none; } .match-card.revealed-result .teams .live-teams { display:inline; }
+.result .match-update-button { white-space:nowrap; padding:7px 10px; } .result .match-update-button[hidden] { display:none; }
+.spoiler-action { display:none; }
 .conditions { margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fffdf7; color:var(--muted); }
 .conditions strong { color:var(--ink); }
 .standings-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; }
@@ -205,13 +206,14 @@ document.addEventListener('click', event => {
   const matchUpdate = event.target.closest('[data-update-match]');
   if (matchUpdate) {
     event.preventDefault();
-    revealMatch(matchUpdate.closest('.match-card'));
+    event.stopPropagation();
+    toggleMatch(matchUpdate.closest('.match-card'));
     return;
   }
   const leaderboardUpdate = event.target.closest('[data-update-leaderboard]');
   if (leaderboardUpdate) {
     event.preventDefault();
-    revealLeaderboard();
+    toggleLeaderboard();
     return;
   }
   const summary = event.target.closest('#knockout-tab .match-card summary');
@@ -243,20 +245,29 @@ document.addEventListener('toggle', event => {
   }
 }, true);
 
+function setMatchRevealState(card, revealed, autoRevealed=false) {
+  if (!card) return;
+  card.classList.toggle('spoiler-hidden', !revealed);
+  card.classList.toggle('revealed-result', revealed);
+  const button = card.querySelector('[data-update-match]');
+  if (button) {
+    button.hidden = autoRevealed;
+    button.textContent = revealed ? 'Hide result' : 'Update match';
+    button.setAttribute('aria-pressed', revealed ? 'true' : 'false');
+  }
+}
 function applyMatchSpoilers() {
   const now = Date.now();
   document.querySelectorAll('.match-card[data-result][data-reveal-at]').forEach(card => {
     if (!card.dataset.result) return;
-    const storageKey = `matchReveal:${card.dataset.matchId}`;
-    const manuallyRevealed = localStorage.getItem(storageKey) === '1';
     const autoRevealed = Date.parse(card.dataset.revealAt) <= now;
-    card.classList.toggle('spoiler-hidden', !(manuallyRevealed || autoRevealed));
+    setMatchRevealState(card, autoRevealed, autoRevealed);
   });
 }
-function revealMatch(card) {
+function toggleMatch(card) {
   if (!card) return;
-  localStorage.setItem(`matchReveal:${card.dataset.matchId}`, '1');
-  card.classList.remove('spoiler-hidden');
+  const reveal = card.classList.contains('spoiler-hidden');
+  setMatchRevealState(card, reveal, false);
 }
 function renderLeaderboardRows(rows) {
   return rows.map(row => `
@@ -280,19 +291,31 @@ function spoilerSafeLeaderboardRows() {
   });
   return selected.rows || [];
 }
+let leaderboardRevealed = false;
+function rowsEqual(a, b) {
+  return JSON.stringify(a || []) === JSON.stringify(b || []);
+}
 function applyLeaderboardSpoilerMode() {
   const tbody = document.querySelector('.leaderboard-table tbody');
   if (!tbody || !window.LEADERBOARD_SNAPSHOTS) return;
-  const revealed = localStorage.getItem('leaderboardReveal') === '1';
-  tbody.innerHTML = renderLeaderboardRows(revealed ? window.LEADERBOARD_SNAPSHOTS.live : spoilerSafeLeaderboardRows());
+  const safeRows = spoilerSafeLeaderboardRows();
+  const liveRows = window.LEADERBOARD_SNAPSHOTS.live || [];
+  const hasHiddenUpdates = !rowsEqual(safeRows, liveRows);
+  if (!hasHiddenUpdates) leaderboardRevealed = true;
+  tbody.innerHTML = renderLeaderboardRows(leaderboardRevealed ? liveRows : safeRows);
   const button = document.querySelector('[data-update-leaderboard]');
   const note = document.querySelector('[data-leaderboard-note]');
-  if (button) button.textContent = revealed ? 'Showing updated leaderboard' : 'Update leaderboard';
-  if (button) button.disabled = revealed;
-  if (note) note.textContent = revealed ? 'Live results are revealed on this device.' : 'Spoiler-free until noon ET the day after each completed match, unless updated here.';
+  if (button) {
+    button.hidden = !hasHiddenUpdates;
+    button.textContent = leaderboardRevealed ? 'Hide updated leaderboard' : 'Update leaderboard';
+    button.setAttribute('aria-pressed', leaderboardRevealed ? 'true' : 'false');
+  }
+  if (note) note.textContent = hasHiddenUpdates
+    ? (leaderboardRevealed ? 'Updated leaderboard is showing. Tap again to return to spoiler-free.' : 'Spoiler-free until noon ET the day after each completed match, unless updated here.')
+    : 'Leaderboard is current.';
 }
-function revealLeaderboard() {
-  localStorage.setItem('leaderboardReveal', '1');
+function toggleLeaderboard() {
+  leaderboardRevealed = !leaderboardRevealed;
   applyLeaderboardSpoilerMode();
 }
 
@@ -607,10 +630,12 @@ def _round_section(label, matches, impacts, leaderboard_order):
 
 def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     result = match.get("result") or "Not played"
-    score = ""
     if match.get("goals_a") is not None and match.get("goals_b") is not None:
-        score = f"<span>{match['goals_a']} - {match['goals_b']}</span>"
-    result_html = f'<span class="live-result">{escape(result)} {score}</span><span class="spoiler-result">Not played</span>' if match.get("result") else escape(result)
+        live_teams = f"{match['team_a']} {match['goals_a']} - {match['goals_b']} {match['team_b']}"
+    else:
+        live_teams = f"{match['team_a']} vs {match['team_b']}"
+    default_teams = f"{match['team_a']} vs {match['team_b']}"
+    result_html = '<button type="button" class="match-update-button" data-update-match>Update match</button>' if match.get("result") else escape(result)
     reveal_at = _match_reveal_at(match) if match.get("result") else ""
     scenarios = _visible_scenarios(match)
     users = _ordered_users(impacts, leaderboard_order)
@@ -629,13 +654,12 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     venue = f'<p class="venue">{escape(" · ".join(part for part in meta_parts if part))}</p>'
     result_attr = escape(match.get("result") or "")
     reveal_attr = escape(reveal_at)
-    update_button = '<div class="spoiler-action"><button type="button" class="match-update-button" data-update-match>Update this match</button></div>' if match.get("result") else ""
     card_class = "match-card spoiler-hidden" if match.get("result") else "match-card"
+    teams_html = f'<span class="default-teams">{escape(default_teams)}</span><span class="live-teams">{escape(live_teams)}</span>'
     return f"""<details class="{card_class}" data-match-id="{escape(match["match_id"])}" data-result="{result_attr}" data-reveal-at="{reveal_attr}">
-  <summary><span class="stage">{stage}</span><span class="teams">{escape(match["team_a"])} vs {escape(match["team_b"])}</span><span class="result">{result_html}</span></summary>
+  <summary><span class="stage">{stage}</span><span class="teams">{teams_html}</span><span class="result">{result_html}</span></summary>
   <div class="impact">
     {venue}
-    {update_button}
     <div class="impact-grid" style="--scenario-count:{len(scenarios)}">
       <div class="impact-cell impact-head">User</div>
       {headers}
