@@ -1,0 +1,30 @@
+[
+  {
+    "user_id": "ana",
+    "display_name": "Ana",
+    "group": "Friends",
+    "champion": "Brazil",
+    "dark_horse": "Haiti"
+  },
+  {
+    "user_id": "ben",
+    "display_name": "Ben",
+    "group": "Office",
+    "champion": "France",
+    "dark_horse": "Japan"
+  },
+  {
+    "user_id": "cleo",
+    "display_name": "Cleo",
+    "group": "Friends",
+    "champion": "Argentina",
+    "dark_horse": "New Zealand"
+  },
+  {
+    "user_id": "diego",
+    "display_name": "Diego",
+    "group": "Family",
+    "champion": "Spain",
+    "dark_horse": "Morocco"
+  }
+]

@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World Cup Fantasy Dashboard</title>
+  <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Deterministic scoring MVP</p>
+      <h1>World Cup Fantasy Dashboard</h1>
+    </div>
+    <div class="hash">Input hash<br><code>572dba248fff3a20</code></div>
+  </header>
+
+  <main>
+    <section class="panel leaderboard-panel">
+      <div class="section-heading">
+        <h2>Leaderboard</h2>
+        <span>4 participants</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>User</th>
+              <th>Group</th>
+              <th>Knockout</th>
+              <th>Champion</th>
+              <th>Dark Horse</th>
+              <th>3rd</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+  <td>1</td>
+  <td><strong>Cleo</strong><br><small>Friends</small></td>
+  <td>1</td>
+  <td>3</td>
+  <td>0</td>
+  <td>4</td>
+  <td>0</td>
+  <td class="total">8</td>
+</tr>
+<tr>
+  <td>2</td>
+  <td><strong>Ana</strong><br><small>Friends</small></td>
+  <td>2</td>
+  <td>3</td>
+  <td>0</td>
+  <td>1</td>
+  <td>0</td>
+  <td class="total">6</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td><strong>Diego</strong><br><small>Family</small></td>
+  <td>1</td>
+  <td>3</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">4</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td><strong>Ben</strong><br><small>Office</small></td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>2</td>
+  <td>0</td>
+  <td class="total">3</td>
+</tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="matches">
+      <div class="section-heading">
+        <h2>Matches</h2>
+        <span>Click a match to inspect scenario impact</span>
+      </div>
+      <section class="date-group">
+  <h3>2026-06-11</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">group</span>
+    <span class="teams">Brazil vs Haiti</span>
+    <span class="result">A_WIN <span>2 - 0</span></span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>1</td>
+  <td>0</td>
+  <td class="total">2</td>
+  <td>Correct group result (+1); Dark horse correct prediction bonus (+1).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Draw</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>1</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Dark horse group draw (+1).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Dark horse group win (+3).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+<details class="match-card">
+  <summary>
+    <span class="stage">group</span>
+    <span class="teams">France vs Japan</span>
+    <span class="result">DRAW <span>1 - 1</span></span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Draw</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>2</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Correct group result (+1); Dark horse group draw (+1); Dark horse correct prediction bonus (+1).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Dark horse group win (+3).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+<section class="date-group">
+  <h3>2026-06-12</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">group</span>
+    <span class="teams">Argentina vs New Zealand</span>
+    <span class="result">B_WIN <span>0 - 1</span></span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Draw</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Correct group result (+1).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>1</td>
+  <td>0</td>
+  <td class="total">1</td>
+  <td>Dark horse group draw (+1).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>1</td>
+  <td>0</td>
+  <td>0</td>
+  <td>4</td>
+  <td>0</td>
+  <td class="total">5</td>
+  <td>Correct group result (+1); Dark horse group win (+3); Dark horse correct prediction bonus (+1).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+<section class="date-group">
+  <h3>2026-06-28</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">R32</span>
+    <span class="teams">Brazil vs Japan</span>
+    <span class="result">A_WIN <span>3 - 1</span></span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Correct R32 winner (+3).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Correct R32 winner (+3).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">3</td>
+  <td>Correct R32 winner (+3).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>3</td>
+  <td>0</td>
+  <td>5</td>
+  <td>0</td>
+  <td class="total">8</td>
+  <td>Correct R32 winner (+3); Dark horse knockout win (+5).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+<section class="date-group">
+  <h3>2026-07-02</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">R16</span>
+    <span class="teams">Brazil vs Spain</span>
+    <span class="result">Not played </span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>5</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">5</td>
+  <td>Correct R16 winner (+5).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>5</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">5</td>
+  <td>Correct R16 winner (+5).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>5</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">5</td>
+  <td>Correct R16 winner (+5).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>5</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">5</td>
+  <td>Correct R16 winner (+5).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+<section class="date-group">
+  <h3>2026-07-18</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">3RD</span>
+    <span class="teams">France vs Spain</span>
+    <span class="result">Not played </span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>8</td>
+  <td class="total">8</td>
+  <td>Eligible 3rd-place prediction hit (+8).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+<section class="date-group">
+  <h3>2026-07-19</h3>
+  <div class="match-grid">
+    <details class="match-card">
+  <summary>
+    <span class="stage">F</span>
+    <span class="teams">Brazil vs Argentina</span>
+    <span class="result">Not played </span>
+  </summary>
+  <div class="impact">
+    <div class="scenario">
+  <h4>Team A wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>10</td>
+  <td>2</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">12</td>
+  <td>Correct F winner (+10); Champion tournament-path bonus (+2).</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>10</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">10</td>
+  <td>Correct F winner (+10).</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+<div class="scenario">
+  <h4>Team B wins</h4>
+  <div class="table-wrap">
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Group</th>
+          <th>KO</th>
+          <th>Champ</th>
+          <th>Dark</th>
+          <th>3rd</th>
+          <th>Total</th>
+          <th>Why</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  <td>Ana</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr>
+<tr>
+  <td>Ben</td>
+  <td>0</td>
+  <td>10</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">10</td>
+  <td>Correct F winner (+10).</td>
+</tr>
+<tr>
+  <td>Cleo</td>
+  <td>0</td>
+  <td>10</td>
+  <td>2</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">12</td>
+  <td>Correct F winner (+10); Champion tournament-path bonus (+2).</td>
+</tr>
+<tr>
+  <td>Diego</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td>0</td>
+  <td class="total">0</td>
+  <td>No points.</td>
+</tr></tbody>
+    </table>
+  </div>
+</div>
+  </div>
+</details>
+  </div>
+</section>
+    </section>
+  </main>
+</body>
+</html>
