@@ -128,6 +128,35 @@ def test_champion_bonus_stacks_with_final_pick_points():
     assert total["total_points"] == 12
 
 
+def test_champion_bonus_requires_pick_to_match_champion_win():
+    matches = [
+        {
+            "match_id": "R32",
+            "stage": "R32",
+            "date": "2026-06-28",
+            "team_a": "Spain",
+            "team_b": "France",
+            "result": "A_WIN",
+        }
+    ]
+    users = [
+        {
+            "user_id": "u1",
+            "display_name": "User",
+            "champion": "Spain",
+            "dark_horse": "Japan",
+        }
+    ]
+    predictions = [{"user_id": "u1", "match_id": "R32", "prediction": "B_WIN"}]
+
+    result = calculate_scores(matches, predictions, users, [], {})
+    total = result["leaderboard"][0]
+
+    assert total["knockout_points"] == 0
+    assert total["champion_points"] == 0
+    assert total["total_points"] == 0
+
+
 def test_leaderboard_ties_share_rank_and_skip_next_rank():
     matches = [
         {

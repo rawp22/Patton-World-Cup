@@ -170,9 +170,14 @@ def score_match_for_user(
             explanations.append("Dark horse knockout win (+5)")
 
     champion = user.get("champion")
-    if champion and match["stage"] in KNOCKOUT_STAGES and winner == champion:
+    if (
+        champion
+        and match["stage"] in KNOCKOUT_STAGES
+        and winner == champion
+        and predicted_result == result
+    ):
         points["champion_points"] += 2
-        explanations.append("Champion knockout win bonus (+2)")
+        explanations.append("Champion picked knockout win bonus (+2)")
 
     if match["stage"] == "3RD" and third_place_eligible:
         if _third_place_prediction_hits(match, third_place_prediction):
