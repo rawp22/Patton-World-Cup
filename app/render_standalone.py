@@ -124,10 +124,12 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .paper-group { border:1px solid var(--line); border-radius:8px; background:#fffaf0; padding:12px; }
 .paper-group h4 { color:var(--gold-dark); margin-bottom:8px; }
 .team-list { display:grid; gap:5px; margin-bottom:10px; }
-.pick-list { display:grid; gap:6px; }
-.pick-row { display:grid; grid-template-columns:1fr auto; gap:10px; padding:7px 0; border-top:1px solid var(--line); }
+.pick-list { display:grid; gap:0; }
+.pick-row { display:grid; grid-template-columns:minmax(0,1fr) 42px; gap:10px; align-items:center; min-height:34px; padding:7px 0; border-top:1px solid var(--line); }
+.pick-matchup { min-width:0; }
+.pick-points { align-self:stretch; display:flex; align-items:center; justify-content:flex-end; color:var(--gold-dark); font-weight:950; text-align:right; }
 .pick { color:var(--gold-dark); font-weight:900; text-align:right; }
-@media (max-width:720px) { .topbar { align-items:start; flex-direction:column; } .hash { text-align:left; } .match-card summary { grid-template-columns:1fr; } .result { justify-self:start; } .impact-grid { grid-template-columns:1fr; } .impact-cell { border-left:0; } .pick-row { grid-template-columns:1fr; } .pick { text-align:left; } }
+@media (max-width:720px) { .topbar { align-items:start; flex-direction:column; } .hash { text-align:left; } .match-card summary { grid-template-columns:1fr; } .result { justify-self:start; } .impact-grid { grid-template-columns:1fr; } .impact-cell { border-left:0; } .pick-row { grid-template-columns:minmax(0,1fr) 42px; } .pick { text-align:left; } }
 """
 
 
@@ -295,6 +297,15 @@ let leaderboardRevealed = false;
 function rowsEqual(a, b) {
   return JSON.stringify(a || []) === JSON.stringify(b || []);
 }
+function applyUserBracketPoints() {
+  const now = Date.now();
+  document.querySelectorAll('[data-pick-live-points]').forEach(point => {
+    const revealAt = point.dataset.revealAt || '';
+    const autoRevealed = revealAt && Date.parse(revealAt) <= now;
+    const showLive = leaderboardRevealed || autoRevealed;
+    point.textContent = showLive ? point.dataset.pickLivePoints : point.dataset.pickSafePoints;
+  });
+}
 function applyLeaderboardSpoilerMode() {
   const tbody = document.querySelector('.leaderboard-table tbody');
   if (!tbody || !window.LEADERBOARD_SNAPSHOTS) return;
@@ -313,6 +324,7 @@ function applyLeaderboardSpoilerMode() {
   if (note) note.textContent = hasHiddenUpdates
     ? (leaderboardRevealed ? 'Updated leaderboard is showing. Tap again to return to spoiler-free.' : 'Spoiler-free until noon ET the day after each completed match, unless updated here.')
     : 'Leaderboard is current.';
+  applyUserBracketPoints();
 }
 function toggleLeaderboard() {
   leaderboardRevealed = !leaderboardRevealed;
@@ -355,7 +367,8 @@ def render_standalone_dashboard() -> str:
     report_match_ids = _final_group_match_ids(group_matches)
     match_sections = "\n".join(_date_section(date, matches, result["match_impacts"], leaderboard_order, report_match_ids) for date, matches in matches_by_date.items())
     standings_sections = "\n".join(_group_card(group, teams, data["matches"]) for group, teams in groups.items())
-    user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match)
+    bracket_points = {(row["user_id"], row["match_id"]): row["total_points"] for row in result["breakdowns"]}
+    user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points)
     knockout_sections = _knockout_bracket(knockout_by_round, result["match_impacts"], leaderboard_order)
 
     return f"""<!doctype html>
@@ -737,7 +750,7 @@ def _team_label_with_flag(team):
     return f'<span class="team-name">{_flag_img(team, "Team")}<span>{escape(team)}</span></span>'
 
 
-def _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match):
+def _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points):
     matches_by_group = defaultdict(list)
     for match in sorted(group_matches, key=lambda item: (item.get("group", ""), item["date"], item["match_id"])):
         matches_by_group[match.get("group")].append(match)
@@ -747,7 +760,15 @@ def _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, 
         groups_html = []
         for group, teams in groups.items():
             team_rows = "".join(f'<span>{_team_label_with_flag(team)}</span>' for team in teams)
-            pick_rows = "".join(_user_pick_row(user_id, match, predictions_by_user_match.get((user_id, match["match_id"]))) for match in matches_by_group[group])
+            pick_rows = "".join(
+                _user_pick_row(
+                    user_id,
+                    match,
+                    predictions_by_user_match.get((user_id, match["match_id"])),
+                    bracket_points.get((user_id, match["match_id"]), 0),
+                )
+                for match in matches_by_group[group]
+            )
             groups_html.append(f'''<section class="paper-group">
   <h4>Group {escape(group)}</h4>
   <div class="team-list">{team_rows}</div>
@@ -760,7 +781,7 @@ def _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, 
     return "".join(sections)
 
 
-def _user_pick_row(user_id, match, prediction):
+def _user_pick_row(user_id, match, prediction, points):
     team_a = escape(match["team_a"])
     team_b = escape(match["team_b"])
     if prediction == "A_WIN":
@@ -771,7 +792,16 @@ def _user_pick_row(user_id, match, prediction):
         matchup = f"{team_a} vs {team_b} <strong>(D)</strong>"
     else:
         matchup = f"{team_a} vs {team_b}"
-    return f'<div class="pick-row"><span>{matchup}</span></div>'
+    safe_points = "0" if match.get("result") else ""
+    live_points = _fmt_points(points) if match.get("result") else ""
+    reveal_at = _match_reveal_at(match) if match.get("result") else ""
+    return (
+        f'<div class="pick-row">'
+        f'<span class="pick-matchup">{matchup}</span>'
+        f'<span class="pick-points" data-pick-safe-points="{escape(safe_points)}" '
+        f'data-pick-live-points="{escape(live_points)}" data-reveal-at="{escape(reveal_at)}">{escape(safe_points)}</span>'
+        f'</div>'
+    )
 
 
 def _prediction_label(match, prediction):
