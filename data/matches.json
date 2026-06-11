@@ -6,9 +6,9 @@
     "date": "2026-06-11",
     "team_a": "Mexico",
     "team_b": "South Africa",
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 0,
     "venue": "Estadio Azteca, Mexico City",
     "kickoff_et": "15:00 ET"
   },
