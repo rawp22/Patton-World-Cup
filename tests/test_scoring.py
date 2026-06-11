@@ -59,41 +59,73 @@ def test_knockout_and_dark_horse_points_stack():
     assert total["total_points"] == 13
 
 
-def test_champion_bonus_requires_final_winner():
+def test_champion_bonus_applies_per_knockout_win_even_without_title():
     matches = [
         {
             "match_id": "R32",
             "stage": "R32",
             "date": "2026-06-28",
-            "team_a": "Brazil",
+            "team_a": "Spain",
             "team_b": "Japan",
             "result": "A_WIN",
         },
         {
-            "match_id": "F",
-            "stage": "F",
-            "date": "2026-07-19",
-            "team_a": "Brazil",
+            "match_id": "R16",
+            "stage": "R16",
+            "date": "2026-07-04",
+            "team_a": "Spain",
             "team_b": "France",
-            "result": "A_WIN",
+            "result": "B_WIN",
         },
     ]
     users = [
         {
             "user_id": "u1",
             "display_name": "User",
-            "champion": "Brazil",
+            "champion": "Spain",
             "dark_horse": "Japan",
         }
     ]
     predictions = [
-        {"user_id": "u1", "match_id": "R32", "prediction": "B_WIN"},
-        {"user_id": "u1", "match_id": "F", "prediction": "B_WIN"},
+        {"user_id": "u1", "match_id": "R32", "prediction": "A_WIN"},
+        {"user_id": "u1", "match_id": "R16", "prediction": "A_WIN"},
     ]
 
     result = calculate_scores(matches, predictions, users, [], {})
+    total = result["leaderboard"][0]
 
-    assert result["leaderboard"][0]["champion_points"] == 4
+    assert total["knockout_points"] == 3
+    assert total["champion_points"] == 2
+    assert total["total_points"] == 5
+
+
+def test_champion_bonus_stacks_with_final_pick_points():
+    matches = [
+        {
+            "match_id": "F",
+            "stage": "F",
+            "date": "2026-07-19",
+            "team_a": "Spain",
+            "team_b": "France",
+            "result": "A_WIN",
+        }
+    ]
+    users = [
+        {
+            "user_id": "u1",
+            "display_name": "User",
+            "champion": "Spain",
+            "dark_horse": "Japan",
+        }
+    ]
+    predictions = [{"user_id": "u1", "match_id": "F", "prediction": "A_WIN"}]
+
+    result = calculate_scores(matches, predictions, users, [], {})
+    total = result["leaderboard"][0]
+
+    assert total["knockout_points"] == 10
+    assert total["champion_points"] == 2
+    assert total["total_points"] == 12
 
 
 def test_leaderboard_ties_share_rank_and_skip_next_rank():
