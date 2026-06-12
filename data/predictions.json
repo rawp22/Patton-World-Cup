@@ -1120,6 +1120,356 @@
     "prediction": "A_WIN"
   },
   {
+    "user_id": "callahan",
+    "match_id": "G03",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G04",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G05",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G06",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G07",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G08",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G09",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G10",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G11",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G12",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G13",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G14",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G15",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G16",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G17",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G18",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G19",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G20",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G21",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G22",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G23",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G24",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G25",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G26",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G27",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G28",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G29",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G30",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G31",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G32",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G33",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G34",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G35",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G36",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G37",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G38",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G39",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G40",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G41",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G42",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G43",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G44",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G45",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G46",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G47",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G48",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G49",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G50",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G51",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G52",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G53",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G54",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G55",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G56",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G57",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G58",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G59",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G60",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G61",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G62",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G63",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G64",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G65",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G66",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G67",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G68",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G69",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G70",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G71",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "G72",
+    "prediction": "A_WIN"
+  },
+  {
     "user_id": "steven",
     "match_id": "G01",
     "prediction": "A_WIN"
