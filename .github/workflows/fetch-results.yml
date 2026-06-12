@@ -3,10 +3,9 @@ name: Fetch match results
 on:
   workflow_dispatch:
   schedule:
-    # GitHub schedules are UTC and can be delayed. Run off the top of the hour
-    # so completed matches are picked up reliably; the script skips when no
-    # unfinished match is at least two hours past kickoff.
-    - cron: "7,17,27,37,47,57 * * * *"
+    # GitHub schedules are UTC and can be delayed. Run every 5 minutes;
+    # the script skips when no unfinished match is at least two hours past kickoff.
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: write
