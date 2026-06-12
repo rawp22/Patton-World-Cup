@@ -86,7 +86,7 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .impact-cell.name { border-left:0; text-align:left; font-weight:800; }
 .impact-head { background:var(--gold-soft); color:var(--gold-dark); font-weight:950; border-top:0; }
 .impact-head:first-child { border-left:0; color:var(--muted); }
-.points { font-weight:950; } .points:not(.zero-points) { position:relative; z-index:1; } .points:not(.zero-points)::after { content:""; position:absolute; inset:-1px; border:1px solid var(--line); pointer-events:none; z-index:2; } .points.zero-points { opacity:.34; color:var(--muted); font-weight:650; } .scenario-muted { opacity:.34; color:var(--muted); font-weight:650; } .scenario-active { color:var(--gold-dark); font-weight:950; background:#fff7dc; } .impact-head.scenario-active { background:#f1cf6a; } .impact-head.scenario-muted { background:#faf3df; }
+.points { font-weight:950; } .points:not(.zero-points) { position:relative; z-index:1; } .points:not(.zero-points)::after { content:""; position:absolute; inset:-1px; border:1px solid var(--line); pointer-events:none; z-index:2; } .points.zero-points { opacity:.34; color:var(--muted); font-weight:650; } .match-card.revealed-result .points.scenario-active.zero-points { opacity:1; color:var(--gold-dark); font-weight:950; } .scenario-muted { opacity:.34; color:var(--muted); font-weight:650; } .scenario-active { color:var(--gold-dark); font-weight:950; background:#fff7dc; } .impact-head.scenario-active { background:#f1cf6a; } .impact-head.scenario-muted { background:#faf3df; }
 .match-card.spoiler-hidden .scenario-muted, .match-card.spoiler-hidden .scenario-active { opacity:1; color:inherit; font-weight:950; background:transparent; } .match-card.spoiler-hidden .points.zero-points { opacity:.34; color:var(--muted); font-weight:650; }
 .match-card.spoiler-hidden .impact-head.scenario-muted, .match-card.spoiler-hidden .impact-head.scenario-active { background:var(--gold-soft); color:var(--gold-dark); }
 .teams .live-teams { display:none; } .match-card.revealed-result .teams .default-teams { display:none; } .match-card.revealed-result .teams .live-teams { display:inline; }
@@ -684,8 +684,7 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
 
 
 def _impact_points_cell(match, scenario, points):
-    is_final_result = bool(match.get("result")) and scenario == match.get("result")
-    zero_class = " zero-points" if points == 0 and not is_final_result else ""
+    zero_class = " zero-points" if points == 0 else ""
     return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}">{_fmt_points(points)}</div>'
 
 
