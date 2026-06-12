@@ -84,9 +84,9 @@
     "date": "2026-06-12",
     "team_a": "Canada",
     "team_b": "Bosnia and Herzegovina",
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "DRAW",
+    "goals_a": 1,
+    "goals_b": 1,
     "venue": "BMO Field, Toronto",
     "kickoff_et": "15:00 ET"
   },
