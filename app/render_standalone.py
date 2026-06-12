@@ -684,7 +684,8 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
 
 
 def _impact_points_cell(match, scenario, points):
-    zero_class = " zero-points" if points == 0 else ""
+    is_final_result = bool(match.get("result")) and scenario == match.get("result")
+    zero_class = " zero-points" if points == 0 and not is_final_result else ""
     return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}">{_fmt_points(points)}</div>'
 
 
