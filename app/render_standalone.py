@@ -59,9 +59,9 @@ main { width:min(1180px, calc(100% - 32px)); margin:24px auto 48px; }
 .panel,.date-group,.group-card,.round-card,.user-bracket { background:var(--panel); border:1px solid var(--line); border-radius:8px; box-shadow:0 8px 28px var(--shadow); }
 .leaderboard-panel { margin-bottom:24px; overflow:hidden; border-top:4px solid var(--gold); } .leaderboard-panel .section-heading { padding:18px 20px 0; }
 .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; min-width:760px; table-layout:auto; }
-.leaderboard-table { width:100%; min-width:860px; } .leaderboard-table .rank-col { width:58px; } .leaderboard-table .user-col { width:250px; } .leaderboard-table .score-col { width:72px; } .leaderboard-table .stat-gap-col { width:38px; } .leaderboard-table .ko-col { width:92px; } .leaderboard-table .draws-col { width:82px; } .leaderboard-table .trail-col { width:auto; } .leaderboard-table .spacer-cell { padding:0; }
+.leaderboard-table { width:100%; min-width:860px; } .leaderboard-table .rank-col { width:58px; } .leaderboard-table .user-col { width:250px; } .leaderboard-table .score-col { width:72px; } .leaderboard-table .stat-gap-col { width:38px; } .leaderboard-table .ko-col { width:92px; } .leaderboard-table .draws-col { width:110px; } .leaderboard-table .trail-col { width:auto; } .leaderboard-table .spacer-cell { padding:0; }
 th,td { padding:11px 12px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
-th { color:var(--muted); font-size:12px; font-weight:900; text-transform:uppercase; } td:not(:nth-child(2)),th:not(:nth-child(2)) { text-align:right; }
+th { color:var(--muted); font-size:12px; font-weight:900; text-transform:uppercase; white-space:nowrap; } td:not(:nth-child(2)),th:not(:nth-child(2)) { text-align:right; }
 small { color:var(--muted); } .total { color:var(--gold-dark); font-weight:950; }
 .user-name,.team-name { display:flex; align-items:center; gap:8px; font-weight:850; } .flags { display:inline-flex; align-items:center; gap:4px; min-width:54px; }
 .flag-wrap { display:inline-flex; align-items:center; } .flag-icon { width:24px; height:18px; object-fit:cover; border:1px solid var(--line); border-radius:3px; background:#fff; box-shadow:0 1px 2px rgb(83 61 24 / 12%); } .flag-fallback { color:var(--muted); font-size:11px; font-weight:900; }
