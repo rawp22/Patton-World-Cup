@@ -59,7 +59,7 @@ main { width:min(1180px, calc(100% - 32px)); margin:24px auto 48px; }
 .panel,.date-group,.group-card,.round-card,.user-bracket { background:var(--panel); border:1px solid var(--line); border-radius:8px; box-shadow:0 8px 28px var(--shadow); }
 .leaderboard-panel { margin-bottom:24px; overflow:hidden; border-top:4px solid var(--gold); } .leaderboard-panel .section-heading { padding:18px 20px 0; }
 .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; min-width:760px; table-layout:auto; }
-.leaderboard-table { width:770px !important; min-width:770px; max-width:770px; } .leaderboard-table .rank-col { width:58px; } .leaderboard-table .user-col { width:250px; } .leaderboard-table .score-col { width:72px; } .leaderboard-table .ko-col { width:92px; } .leaderboard-table .draws-col { width:82px; }
+.leaderboard-table { width:100%; min-width:860px; } .leaderboard-table .rank-col { width:58px; } .leaderboard-table .user-col { width:250px; } .leaderboard-table .score-col { width:72px; } .leaderboard-table .stat-gap-col { width:38px; } .leaderboard-table .ko-col { width:92px; } .leaderboard-table .draws-col { width:82px; } .leaderboard-table .trail-col { width:auto; } .leaderboard-table .spacer-cell { padding:0; }
 th,td { padding:11px 12px; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
 th { color:var(--muted); font-size:12px; font-weight:900; text-transform:uppercase; } td:not(:nth-child(2)),th:not(:nth-child(2)) { text-align:right; }
 small { color:var(--muted); } .total { color:var(--gold-dark); font-weight:950; }
@@ -277,11 +277,13 @@ function renderLeaderboardRows(rows) {
   <td>${row.rank}</td>
   <td>${row.user_html}</td>
   <td class="total">${row.total_points}</td>
+  <td class="spacer-cell"></td>
   <td>${row.group_points}</td>
   <td>${row.knockout_points}</td>
   <td>${row.dark_horse_points}</td>
   <td>${row.champion_points}</td>
   <td>${row.draws}</td>
+  <td class="spacer-cell"></td>
 </tr>`).join('');
 }
 function spoilerSafeLeaderboardRows() {
@@ -593,8 +595,8 @@ def render_standalone_dashboard() -> str:
       <div class="section-heading"><h2>Leaderboard</h2><span>{len(result["leaderboard"])} participants</span></div>
       <div class="table-wrap">
         <table class="leaderboard-table">
-          <colgroup><col class="rank-col"><col class="user-col"><col class="score-col"><col class="score-col"><col class="ko-col"><col class="score-col"><col class="score-col"><col class="draws-col"></colgroup>
-          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th>Group</th><th>Knockout</th><th>DHB</th><th>CB</th><th># Draws</th></tr></thead>
+          <colgroup><col class="rank-col"><col class="user-col"><col class="score-col"><col class="stat-gap-col"><col class="score-col"><col class="ko-col"><col class="score-col"><col class="score-col"><col class="draws-col"><col class="trail-col"></colgroup>
+          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th class="spacer-cell"></th><th>Group</th><th>Knockout</th><th>DHB</th><th>CB</th><th># Draws</th><th class="spacer-cell"></th></tr></thead>
           <tbody>{leaderboard_rows}</tbody>
         </table>
       </div>
@@ -727,11 +729,13 @@ def _leaderboard_json_row_html(row):
   <td>{row["rank"]}</td>
   <td>{row["user_html"]}</td>
   <td class="total">{row["total_points"]}</td>
+  <td class="spacer-cell"></td>
   <td>{row["group_points"]}</td>
   <td>{row["knockout_points"]}</td>
   <td>{row["dark_horse_points"]}</td>
   <td>{row["champion_points"]}</td>
   <td>{row["draws"]}</td>
+  <td class="spacer-cell"></td>
 </tr>"""
 
 
