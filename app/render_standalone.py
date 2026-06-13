@@ -596,7 +596,7 @@ def render_standalone_dashboard() -> str:
       <div class="table-wrap">
         <table class="leaderboard-table">
           <colgroup><col class="rank-col"><col class="user-col"><col class="score-col"><col class="stat-gap-col"><col class="score-col"><col class="ko-col"><col class="score-col"><col class="score-col"><col class="draws-col"><col class="trail-col"></colgroup>
-          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th class="spacer-cell"></th><th>Group</th><th>Knockout</th><th>DHB</th><th>CB</th><th># Draws</th><th class="spacer-cell"></th></tr></thead>
+          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th class="spacer-cell"></th><th>Group</th><th>Knockout</th><th>DHB</th><th>CB</th><th>#&nbsp;Draws</th><th class="spacer-cell"></th></tr></thead>
           <tbody>{leaderboard_rows}</tbody>
         </table>
       </div>
