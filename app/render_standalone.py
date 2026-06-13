@@ -331,11 +331,203 @@ function toggleLeaderboard() {
   applyLeaderboardSpoilerMode();
 }
 
+const TEAM_ALIASES = {
+  'Bosnia and Herzegovina':['Bosnia-Herzegovina','Bosnia & Herzegovina'],
+  'Curacao':['Curaçao'],
+  'DR Congo':['Congo DR','Congo D.R.'],
+  'South Korea':['Korea Republic','Republic of Korea'],
+  'Turkiye':['Türkiye','Turkey'],
+  'United States':['USA','United States of America','USMNT'],
+  'Cape Verde':['Cabo Verde']
+};
+const KNOCKOUT_POINTS = {R32:3, R16:5, QF:8, SF:8, F:10};
+function normalizeTeam(value) {
+  return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+function teamKeys(team) {
+  return new Set([team, ...(TEAM_ALIASES[team] || [])].map(normalizeTeam));
+}
+function kickoffDate(match) {
+  if (!match.kickoff_et) return null;
+  const [hour, minute] = match.kickoff_et.split(' ')[0].split(':');
+  return new Date(`${match.date}T${hour}:${minute}:00-04:00`);
+}
+function resultFromEspnEvent(match, event) {
+  const competition = (event.competitions || [{}])[0];
+  const status = competition.status || event.status || {};
+  const type = status.type || {};
+  if (!(type.completed || type.state === 'post')) return null;
+  const competitors = competition.competitors || [];
+  if (competitors.length < 2) return null;
+  const home = competitors.find(c => c.homeAway === 'home') || competitors[0];
+  const away = competitors.find(c => c.homeAway === 'away') || competitors[1];
+  const names = competitor => {
+    const team = competitor.team || {};
+    return new Set([team.displayName, team.name, team.shortDisplayName, team.abbreviation, competitor.displayName].filter(Boolean).map(normalizeTeam));
+  };
+  const homeKeys = names(home), awayKeys = names(away);
+  const aKeys = teamKeys(match.team_a), bKeys = teamKeys(match.team_b);
+  const intersects = (left, right) => [...left].some(value => right.has(value));
+  const direct = intersects(homeKeys, aKeys) && intersects(awayKeys, bKeys);
+  const reversed = intersects(homeKeys, bKeys) && intersects(awayKeys, aKeys);
+  if (!direct && !reversed) return null;
+  const homeGoals = Number(home.score), awayGoals = Number(away.score);
+  if (!Number.isFinite(homeGoals) || !Number.isFinite(awayGoals)) return null;
+  let homeAwayResult = 'DRAW';
+  if (homeGoals > awayGoals) homeAwayResult = 'HOME_WIN';
+  if (awayGoals > homeGoals) homeAwayResult = 'AWAY_WIN';
+  const result = direct
+    ? {HOME_WIN:'A_WIN', AWAY_WIN:'B_WIN', DRAW:'DRAW'}[homeAwayResult]
+    : {HOME_WIN:'B_WIN', AWAY_WIN:'A_WIN', DRAW:'DRAW'}[homeAwayResult];
+  return direct ? {result, goals_a:homeGoals, goals_b:awayGoals} : {result, goals_a:awayGoals, goals_b:homeGoals};
+}
+async function fetchEspnDate(date) {
+  const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${date.replaceAll('-', '')}`, {cache:'no-store'});
+  if (!response.ok) return [];
+  const payload = await response.json();
+  return payload.events || [];
+}
+function winnerFor(match) {
+  if (match.result === 'A_WIN') return match.team_a;
+  if (match.result === 'B_WIN') return match.team_b;
+  return null;
+}
+function teamInMatch(match, team) {
+  return match.team_a === team || match.team_b === team;
+}
+function predictionMap() {
+  const map = new Map();
+  (window.CLIENT_DATA?.predictions || []).forEach(pred => map.set(`${pred.user_id}:${pred.match_id}`, pred.prediction));
+  return map;
+}
+function scoreForUser(match, user, predicted) {
+  const points = {group_points:0, knockout_points:0, dark_horse_points:0, champion_points:0, total_points:0};
+  if (!match.result) return points;
+  if (match.stage === 'group') {
+    if (predicted === match.result) points.group_points += 1;
+  } else if (KNOCKOUT_POINTS[match.stage] && predicted === match.result) {
+    points.knockout_points += KNOCKOUT_POINTS[match.stage];
+  }
+  const winner = winnerFor(match);
+  if (user.dark_horse && teamInMatch(match, user.dark_horse)) {
+    if (match.stage === 'group') {
+      if (winner === user.dark_horse) points.dark_horse_points += 3;
+      else if (match.result === 'DRAW') points.dark_horse_points += 1;
+    } else if (KNOCKOUT_POINTS[match.stage] && winner === user.dark_horse) {
+      points.dark_horse_points += 5;
+    }
+  }
+  if (user.champion && KNOCKOUT_POINTS[match.stage] && winner === user.champion && predicted === match.result) {
+    points.champion_points += 2;
+  }
+  points.total_points = points.group_points + points.knockout_points + points.dark_horse_points + points.champion_points;
+  return points;
+}
+function assignRanks(rows) {
+  let last = null, lastRank = 0;
+  rows.forEach((row, index) => {
+    if (row.total_points !== last) lastRank = index + 1;
+    row.rank = lastRank;
+    last = row.total_points;
+  });
+}
+function recalcClientLeaderboard() {
+  const data = window.CLIENT_DATA;
+  if (!data) return [];
+  const predMap = predictionMap();
+  const htmlByUser = new Map((window.LEADERBOARD_SNAPSHOTS?.live || []).map(row => [row.user_id, row.user_html]));
+  const rows = data.users.map((user, index) => ({
+    user_id:user.user_id,
+    user_html:htmlByUser.get(user.user_id) || user.display_name || user.user_id,
+    order:index,
+    total_points:0, group_points:0, knockout_points:0, dark_horse_points:0, champion_points:0, draws:0
+  }));
+  const byUser = new Map(rows.map(row => [row.user_id, row]));
+  data.matches.filter(match => match.result).forEach(match => {
+    data.users.forEach(user => {
+      const predicted = predMap.get(`${user.user_id}:${match.match_id}`);
+      const pts = scoreForUser(match, user, predicted);
+      const row = byUser.get(user.user_id);
+      row.total_points += pts.total_points;
+      row.group_points += pts.group_points;
+      row.knockout_points += pts.knockout_points;
+      row.dark_horse_points += pts.dark_horse_points;
+      row.champion_points += pts.champion_points;
+      if (match.stage === 'group' && match.result === 'DRAW' && predicted === 'DRAW') row.draws += 1;
+    });
+  });
+  rows.sort((a,b) => b.total_points - a.total_points || a.order - b.order);
+  assignRanks(rows);
+  return rows;
+}
+function updateClientPickPoints(match) {
+  const data = window.CLIENT_DATA;
+  const predMap = predictionMap();
+  data.users.forEach(user => {
+    const points = scoreForUser(match, user, predMap.get(`${user.user_id}:${match.match_id}`)).total_points;
+    document.querySelectorAll(`[data-pick-live-points][data-user-id="${user.user_id}"][data-match-id="${match.match_id}"]`).forEach(el => {
+      el.dataset.pickSafePoints = '0';
+      el.dataset.pickLivePoints = points > 0 ? `+${points}` : '0';
+      el.dataset.revealAt = document.querySelector(`[data-match-id="${match.match_id}"]`)?.dataset.revealAt || '';
+    });
+  });
+}
+function updateClientMatchCard(match) {
+  const card = document.querySelector(`.match-card[data-match-id="${match.match_id}"]`);
+  if (!card) return;
+  card.dataset.result = match.result || '';
+  const liveTeams = card.querySelector('.live-teams');
+  if (liveTeams) liveTeams.textContent = `${match.team_a} ${match.goals_a} - ${match.goals_b} ${match.team_b}`;
+  const notPlayed = card.querySelector('.not-played');
+  if (notPlayed) notPlayed.hidden = true;
+  const button = card.querySelector('[data-update-match]');
+  if (button) button.hidden = false;
+  card.querySelectorAll('[data-scenario]').forEach(cell => {
+    const scenario = cell.dataset.scenario;
+    cell.classList.remove('scenario-active', 'scenario-muted');
+    if (scenario === match.result) cell.classList.add('scenario-active');
+    else cell.classList.add('scenario-muted');
+    if (cell.classList.contains('points')) {
+      const zero = cell.textContent.trim() === '0';
+      cell.classList.toggle('zero-points', zero);
+    }
+  });
+  updateClientPickPoints(match);
+  applyMatchSpoilers();
+}
+async function fetchClientResults() {
+  const data = window.CLIENT_DATA;
+  if (!data?.matches?.length) return;
+  const now = Date.now();
+  const pending = data.matches.filter(match => !match.result && match.kickoff_et && kickoffDate(match) && now >= kickoffDate(match).getTime() + 2 * 60 * 60 * 1000);
+  const dates = [...new Set(pending.map(match => match.date))];
+  let changed = false;
+  for (const date of dates) {
+    let events = [];
+    try { events = await fetchEspnDate(date); } catch (_) { events = []; }
+    pending.filter(match => match.date === date).forEach(match => {
+      for (const event of events) {
+        const result = resultFromEspnEvent(match, event);
+        if (!result) continue;
+        Object.assign(match, result);
+        updateClientMatchCard(match);
+        changed = true;
+        break;
+      }
+    });
+  }
+  if (changed) {
+    window.LEADERBOARD_SNAPSHOTS.live = recalcClientLeaderboard();
+    applyLeaderboardSpoilerMode();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const initial = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
   showTab(document.getElementById(initial) ? initial : 'matches-tab');
   applyMatchSpoilers();
   applyLeaderboardSpoilerMode();
+  fetchClientResults();
 });
 window.addEventListener('hashchange', () => {
   const target = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
@@ -362,6 +554,7 @@ def render_standalone_dashboard() -> str:
     groups = _groups([match for match in data["matches"] if match["stage"] == "group"])
 
     leaderboard_snapshots = _leaderboard_snapshots(data)
+    client_data = {"matches": data["matches"], "users": data["users"], "predictions": data["predictions"]}
     leaderboard_rows = "\n".join(_leaderboard_json_row_html(row) for row in leaderboard_snapshots["snapshots"][0]["rows"])
     group_matches = [match for match in data["matches"] if match["stage"] == "group"]
     report_match_ids = _final_group_match_ids(group_matches)
@@ -434,7 +627,7 @@ def render_standalone_dashboard() -> str:
       <div class="knockout">{knockout_sections}</div>
     </section>
   </main>
-  <script>window.LEADERBOARD_SNAPSHOTS = {json.dumps(leaderboard_snapshots)};</script>
+  <script>window.LEADERBOARD_SNAPSHOTS = {json.dumps(leaderboard_snapshots)}; window.CLIENT_DATA = {json.dumps(client_data)};</script>
   <script>{SCRIPT}</script>
 </body>
 </html>"""
@@ -515,6 +708,7 @@ def _leaderboard_json_rows(rows, users_by_id, draws):
     for row in rows:
         user = users_by_id[row["user_id"]]
         item = {
+            "user_id": row["user_id"],
             "rank": row["rank"],
             "user_html": f'<span class="user-name"><span class="flags">{_flag_pair(user.get("champion"), user.get("dark_horse"))}</span>{escape(row["display_name"])}</span>',
             "total_points": row["total_points"],
@@ -648,8 +842,11 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     else:
         live_teams = f"{match['team_a']} vs {match['team_b']}"
     default_teams = f"{match['team_a']} vs {match['team_b']}"
-    result_html = '<button type="button" class="match-update-button" data-update-match>Update match</button>' if match.get("result") else escape(result)
-    reveal_at = _match_reveal_at(match) if match.get("result") else ""
+    if match.get("result"):
+        result_html = '<button type="button" class="match-update-button" data-update-match>Update match</button>'
+    else:
+        result_html = '<span class="not-played">Not played</span><button type="button" class="match-update-button" data-update-match hidden>Update match</button>'
+    reveal_at = _match_reveal_at(match) if match["stage"] == "group" else (_match_reveal_at(match) if match.get("result") else "")
     scenarios = _visible_scenarios(match)
     users = _ordered_users(impacts, leaderboard_order)
     by_user_scenario = {(row["user_id"], row["scenario"]): row["total_points"] for row in impacts}
@@ -660,7 +857,7 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
             for scenario in scenarios
         )
         rows.append(f"""<div class="impact-cell name">{escape(name)}</div>{cells}""")
-    headers = "\n".join(f'<div class="impact-cell impact-head {_scenario_class(match, scenario)}">{escape(_scenario_label(match, scenario))}</div>' for scenario in scenarios)
+    headers = "\n".join(f'<div class="impact-cell impact-head {_scenario_class(match, scenario)}" data-scenario="{escape(scenario)}">{escape(_scenario_label(match, scenario))}</div>' for scenario in scenarios)
     condition_report = _match_condition_report(match) if show_group_report else ""
     stage = f"Group {escape(match.get('group', ''))}" if match["stage"] == "group" else escape(match.get("round_label", match["stage"]))
     meta_parts = [match.get("venue", "Venue TBD"), match.get("kickoff_et")]
@@ -685,7 +882,7 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
 
 def _impact_points_cell(match, scenario, points):
     zero_class = " zero-points" if points == 0 else ""
-    return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}">{_fmt_points(points)}</div>'
+    return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}" data-scenario="{escape(scenario)}">{_fmt_points(points)}</div>'
 
 
 def _visible_scenarios(match):
@@ -803,7 +1000,7 @@ def _user_pick_row(user_id, match, prediction, points):
     return (
         f'<div class="pick-row">'
         f'<span class="pick-matchup">{matchup}</span>'
-        f'<span class="pick-points" data-pick-safe-points="{escape(safe_points)}" '
+        f'<span class="pick-points" data-user-id="{escape(user_id)}" data-match-id="{escape(match["match_id"])}" data-pick-safe-points="{escape(safe_points)}" '
         f'data-pick-live-points="{escape(live_points)}" data-reveal-at="{escape(reveal_at)}">{escape(safe_points)}</span>'
         f'</div>'
     )
