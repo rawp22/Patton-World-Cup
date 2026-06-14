@@ -308,6 +308,29 @@ function applyUserBracketPoints() {
     point.textContent = showLive ? point.dataset.pickLivePoints : point.dataset.pickSafePoints;
   });
 }
+function applyImpactRowOrder(rows) {
+  const order = (rows || []).map(row => row.user_id);
+  if (!order.length) return;
+  document.querySelectorAll('.impact-grid').forEach(grid => {
+    const scenarioCount = Number.parseInt(grid.style.getPropertyValue('--scenario-count') || '0', 10);
+    if (!scenarioCount) return;
+    const headerCount = scenarioCount + 1;
+    const headers = Array.from(grid.children).slice(0, headerCount);
+    const rowCells = Array.from(grid.children).slice(headerCount);
+    const cellsByUser = new Map();
+    rowCells.forEach(cell => {
+      const userId = cell.dataset.impactUser;
+      if (!userId) return;
+      if (!cellsByUser.has(userId)) cellsByUser.set(userId, []);
+      cellsByUser.get(userId).push(cell);
+    });
+    grid.replaceChildren(...headers);
+    order.forEach(userId => {
+      const cells = cellsByUser.get(userId);
+      if (cells) grid.append(...cells);
+    });
+  });
+}
 function applyLeaderboardSpoilerMode() {
   const tbody = document.querySelector('.leaderboard-table tbody');
   if (!tbody || !window.LEADERBOARD_SNAPSHOTS) return;
@@ -315,7 +338,9 @@ function applyLeaderboardSpoilerMode() {
   const liveRows = window.LEADERBOARD_SNAPSHOTS.live || [];
   const hasHiddenUpdates = !rowsEqual(safeRows, liveRows);
   if (!hasHiddenUpdates) leaderboardRevealed = true;
-  tbody.innerHTML = renderLeaderboardRows(leaderboardRevealed ? liveRows : safeRows);
+  const displayedRows = leaderboardRevealed ? liveRows : safeRows;
+  tbody.innerHTML = renderLeaderboardRows(displayedRows);
+  applyImpactRowOrder(displayedRows);
   const button = document.querySelector('[data-update-leaderboard]');
   const note = document.querySelector('[data-leaderboard-note]');
   if (button) {
@@ -857,10 +882,10 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
     rows = []
     for user_id, name in users:
         cells = "\n".join(
-            _impact_points_cell(match, scenario, by_user_scenario.get((user_id, scenario), 0))
+            _impact_points_cell(match, scenario, by_user_scenario.get((user_id, scenario), 0), user_id)
             for scenario in scenarios
         )
-        rows.append(f"""<div class="impact-cell name">{escape(name)}</div>{cells}""")
+        rows.append(f"""<div class="impact-cell name" data-impact-user="{escape(user_id)}">{escape(name)}</div>{cells}""")
     headers = "\n".join(f'<div class="impact-cell impact-head {_scenario_class(match, scenario)}" data-scenario="{escape(scenario)}">{escape(_scenario_label(match, scenario))}</div>' for scenario in scenarios)
     condition_report = _match_condition_report(match) if show_group_report else ""
     stage = f"Group {escape(match.get('group', ''))}" if match["stage"] == "group" else escape(match.get("round_label", match["stage"]))
@@ -884,9 +909,9 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
 </details>"""
 
 
-def _impact_points_cell(match, scenario, points):
+def _impact_points_cell(match, scenario, points, user_id):
     zero_class = " zero-points" if points == 0 else ""
-    return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}" data-scenario="{escape(scenario)}">{_fmt_points(points)}</div>'
+    return f'<div class="impact-cell points {_scenario_class(match, scenario)}{zero_class}" data-impact-user="{escape(user_id)}" data-scenario="{escape(scenario)}">{_fmt_points(points)}</div>'
 
 
 def _visible_scenarios(match):
