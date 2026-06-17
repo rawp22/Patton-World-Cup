@@ -286,7 +286,17 @@ function renderLeaderboardRows(rows) {
   <td class="spacer-cell"></td>
 </tr>`).join('');
 }
+function matchRevealTime(match) {
+  const card = document.querySelector(`.match-card[data-match-id="${match.match_id}"]`);
+  const revealAt = card?.dataset.revealAt || '';
+  const parsed = Date.parse(revealAt);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 function spoilerSafeLeaderboardRows() {
+  if (window.CLIENT_DATA?.matches?.length) {
+    const now = Date.now();
+    return recalcClientLeaderboard(match => matchRevealTime(match) <= now);
+  }
   const data = window.LEADERBOARD_SNAPSHOTS || {snapshots:[{reveal_at:'baseline', rows:[]}], live:[]};
   const now = Date.now();
   let selected = data.snapshots[0] || {rows:[]};
@@ -458,7 +468,7 @@ function assignRanks(rows) {
     last = row.total_points;
   });
 }
-function recalcClientLeaderboard() {
+function recalcClientLeaderboard(matchFilter=null) {
   const data = window.CLIENT_DATA;
   if (!data) return [];
   const predMap = predictionMap();
@@ -470,7 +480,7 @@ function recalcClientLeaderboard() {
     total_points:0, group_points:0, knockout_points:0, dark_horse_points:0, champion_points:0, draws:0
   }));
   const byUser = new Map(rows.map(row => [row.user_id, row]));
-  data.matches.filter(match => match.result).forEach(match => {
+  data.matches.filter(match => match.result && (!matchFilter || matchFilter(match))).forEach(match => {
     data.users.forEach(user => {
       const predicted = predMap.get(`${user.user_id}:${match.match_id}`);
       const pts = scoreForUser(match, user, predicted);
