@@ -279,9 +279,9 @@
     "date": "2026-06-19",
     "team_a": "United States",
     "team_b": "Australia",
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 0,
     "venue": "Lumen Field, Seattle",
     "kickoff_et": "15:00 ET"
   },
