@@ -94,7 +94,7 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .spoiler-action { display:none; }
 .conditions { margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fffdf7; color:var(--muted); }
 .conditions strong { color:var(--ink); }
-.scenario-block { margin-top:10px; } .scenario-block ul { margin:6px 0 0 18px; padding:0; } .scenario-block li { margin:5px 0; line-height:1.35; } .scenario-condition { color:var(--ink); font-weight:800; } .margin-list { margin-top:6px !important; } .margin-list li { color:var(--muted); }
+.clinched-summary { margin-top:10px; padding:8px 10px; border-left:4px solid var(--gold); background:#fff7dc; color:var(--ink); } .scenario-block { margin-top:10px; } .scenario-block ul { margin:6px 0 0 18px; padding:0; } .scenario-block li { margin:5px 0; line-height:1.35; } .scenario-condition { color:var(--ink); font-weight:800; } .margin-list { margin-top:6px !important; } .margin-list li { color:var(--muted); }
 .standings-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; }
 .standings table { min-width:0; } .standings td:nth-child(2), .standings th:nth-child(2) { text-align:left; }
 .bracket-note { margin:0 0 14px; color:var(--muted); }
@@ -1206,6 +1206,7 @@ def _remaining_group_matches(group, matches):
 
 def _single_match_scenario_report(match, group, teams, matches, remaining):
     other_matches = [item for item in remaining if item["match_id"] != match["match_id"]]
+    clinched = _clinched_group_summary(group, teams, matches, remaining)
     sections = []
     for outcome in ["A_WIN", "DRAW", "B_WIN"]:
         rows = []
@@ -1220,7 +1221,20 @@ def _single_match_scenario_report(match, group, teams, matches, remaining):
             summary, _ = _score_sensitive_scenario_summary(group, teams, matches, [(match, outcome)])
             rows_html = f'<li>{summary}</li>'
         sections.append(f'<div class="scenario-block"><strong>If {escape(_outcome_label(match, outcome))}:</strong><ul>{rows_html}</ul></div>')
-    return '<div class="conditions"><strong>Group standing report:</strong>' + ''.join(sections) + _tiebreaker_note() + '</div>'
+    return '<div class="conditions"><strong>Group standing report:</strong>' + clinched + ''.join(sections) + _tiebreaker_note() + '</div>'
+
+
+def _clinched_group_summary(group, teams, matches, remaining):
+    locked = []
+    for team in teams:
+        positions = _possible_positions(team, teams, matches, remaining)
+        if len(positions) == 1:
+            position = next(iter(positions))
+            locked.append((position, team))
+    if not locked:
+        return ''
+    text = '; '.join(f'{escape(team)} has clinched {_ordinal(position)}' for position, team in sorted(locked))
+    return f'<div class="clinched-summary"><strong>Already clinched:</strong> {text}</div>'
 
 
 def _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs):
