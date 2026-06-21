@@ -1241,8 +1241,8 @@ def _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs):
     variants = {}
     option_sets = [_scorelines_for_outcome(match, outcome) for match, outcome in scenario_pairs]
     for score_combo in product(*option_sets):
-        ranking = _ranking_for_scores(group, teams, matches, {match["match_id"]: score for (match, _), score in zip(scenario_pairs, score_combo)})
-        key = tuple(row["team"] for row in ranking)
+        ranking, simulated = _ranking_for_scores_with_matches(group, teams, matches, {match["match_id"]: score for (match, _), score in zip(scenario_pairs, score_combo)})
+        key = _ranking_sentence_with_unresolved(group, ranking, simulated)
         examples = variants.setdefault(key, [])
         candidate = tuple((match, score) for (match, _), score in zip(scenario_pairs, score_combo))
         if len(examples) < 3:
@@ -1252,17 +1252,22 @@ def _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs):
             if _score_combo_weight(candidate) < _score_combo_weight(examples[worst_index]):
                 examples[worst_index] = candidate
     if len(variants) == 1:
-        return _ranking_sentence_from_key(next(iter(variants))), False
+        return next(iter(variants)), False
     items = []
     for key, examples in sorted(variants.items(), key=lambda item: item[0]):
         best_examples = sorted(examples, key=_score_combo_weight)[:2]
         example_text = '; '.join(dict.fromkeys(_score_combo_example(example) for example in best_examples))
         label = 'score example' if ';' not in example_text else 'score examples'
-        items.append(f'<li>{_ranking_sentence_from_key(key)} <span class="scenario-condition">{label}:</span> {escape(example_text)}</li>')
+        items.append(f'<li>{key} <span class="scenario-condition">{label}:</span> {escape(example_text)}</li>')
     return 'Goal difference/goals scored dependent:<ul class="margin-list">' + ''.join(items) + '</ul>', True
 
 
 def _ranking_for_scores(group, teams, matches, score_map):
+    ranking, _ = _ranking_for_scores_with_matches(group, teams, matches, score_map)
+    return ranking
+
+
+def _ranking_for_scores_with_matches(group, teams, matches, score_map):
     simulated = [dict(match) for match in matches]
     by_id = {match["match_id"]: match for match in simulated}
     for match_id, score in score_map.items():
@@ -1273,7 +1278,7 @@ def _ranking_for_scores(group, teams, matches, score_map):
         target["result"] = result
         target["goals_a"] = goals_a
         target["goals_b"] = goals_b
-    return _standings(group, teams, simulated)
+    return _standings(group, teams, simulated), simulated
 
 
 def _ranking_for_outcomes(group, teams, matches, outcome_map):
@@ -1292,6 +1297,48 @@ def _ranking_sentence(ranking):
 
 def _ranking_sentence_from_key(ranking_key):
     return ', '.join(f'{index}. {escape(team)}' for index, team in enumerate(ranking_key, start=1))
+
+
+def _ranking_sentence_with_unresolved(group, ranking, matches):
+    unresolved = _unresolved_tie_lookup(group, ranking, matches)
+    parts = []
+    index = 1
+    while index <= len(ranking):
+        team = ranking[index - 1]["team"]
+        tied = unresolved.get(team)
+        if tied:
+            tied_names = '/'.join(escape(name) for name in tied)
+            parts.append(f'{index}. {tied_names} unresolved by modeled criteria')
+            index += len(tied)
+        else:
+            parts.append(f'{index}. {escape(team)}')
+            index += 1
+    return ', '.join(parts)
+
+
+def _unresolved_tie_lookup(group, ranking, matches):
+    lookup = {}
+    rows_by_team = {row["team"]: row for row in ranking}
+    point_groups = defaultdict(list)
+    for row in ranking:
+        point_groups[row["pts"]].append(row)
+    for rows in point_groups.values():
+        if len(rows) < 2:
+            continue
+        tied_teams = {row["team"] for row in rows}
+        h2h = _head_to_head_stats(group, matches, tied_teams)
+        buckets = defaultdict(list)
+        for row in rows:
+            team = row["team"]
+            signature = (h2h[team]["pts"], h2h[team]["gd"], h2h[team]["gf"], row["gd"], row["gf"])
+            buckets[signature].append(team)
+        for tied in buckets.values():
+            if len(tied) < 2:
+                continue
+            tied_sorted = [row["team"] for row in ranking if row["team"] in tied]
+            for team in tied_sorted:
+                lookup[team] = tied_sorted
+    return lookup
 
 
 def _scorelines_for_outcome(match, outcome, max_goals=10):
