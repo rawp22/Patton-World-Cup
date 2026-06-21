@@ -94,6 +94,7 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .spoiler-action { display:none; }
 .conditions { margin-top:14px; padding:12px; border:1px solid var(--line); border-radius:8px; background:#fffdf7; color:var(--muted); }
 .conditions strong { color:var(--ink); }
+.scenario-block { margin-top:10px; } .scenario-block ul { margin:6px 0 0 18px; padding:0; } .scenario-block li { margin:5px 0; line-height:1.35; } .scenario-condition { color:var(--ink); font-weight:800; } .margin-list { margin-top:6px !important; } .margin-list li { color:var(--muted); }
 .standings-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:16px; }
 .standings table { min-width:0; } .standings td:nth-child(2), .standings th:nth-child(2) { text-align:left; }
 .bracket-note { margin:0 0 14px; color:var(--muted); }
@@ -599,7 +600,7 @@ def render_standalone_dashboard() -> str:
     standings_sections = "\n".join(_group_card(group, teams, data["matches"]) for group, teams in groups.items())
     bracket_points = {(row["user_id"], row["match_id"]): row["total_points"] for row in result["breakdowns"]}
     user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points)
-    knockout_sections = _knockout_bracket(knockout_by_round, result["match_impacts"], leaderboard_order)
+    knockout_sections = _knockout_bracket(knockout_by_round, result["match_impacts"], leaderboard_order, groups, data["matches"])
 
     return f"""<!doctype html>
 <html lang="en">
@@ -826,9 +827,17 @@ def _date_section(date, matches, impacts, leaderboard_order, report_match_ids, g
     return f"""<section class="date-group"><h3>{escape(_display_date(date))}</h3><div class="match-grid">{cards}</div></section>"""
 
 
-def _knockout_bracket(knockout_by_round, impacts, leaderboard_order):
+def _knockout_bracket(knockout_by_round, impacts, leaderboard_order, groups=None, all_matches=None):
+    slot_map = _clinched_group_slots(groups or {}, all_matches or [])
+
+    def resolve_match(match):
+        rendered = dict(match)
+        for key in ("team_a", "team_b"):
+            rendered[key] = slot_map.get(rendered.get(key), rendered.get(key))
+        return rendered
+
     def by_ids(round_label, ids):
-        matches = {match["match_id"]: match for match in knockout_by_round.get(round_label, [])}
+        matches = {match["match_id"]: resolve_match(match) for match in knockout_by_round.get(round_label, [])}
         return [matches[match_id] for match_id in ids if match_id in matches]
 
     left = [
@@ -1074,37 +1083,105 @@ def _group_card(group, teams, matches):
 
 def _standings(group, teams, matches):
     table = {team: {"team": team, "mp": 0, "pts": 0, "w": 0, "d": 0, "l": 0, "gf": 0, "ga": 0, "gd": 0} for team in teams}
-    for match in matches:
-        if match.get("group") != group or not match.get("result"):
-            continue
-        a, b = match["team_a"], match["team_b"]
-        ga, gb = match.get("goals_a") or 0, match.get("goals_b") or 0
-        table[a]["mp"] += 1; table[b]["mp"] += 1
-        table[a]["gf"] += ga; table[a]["ga"] += gb
-        table[b]["gf"] += gb; table[b]["ga"] += ga
-        if match["result"] == "A_WIN":
-            table[a]["w"] += 1; table[a]["pts"] += 3; table[b]["l"] += 1
-        elif match["result"] == "B_WIN":
-            table[b]["w"] += 1; table[b]["pts"] += 3; table[a]["l"] += 1
-        else:
-            table[a]["d"] += 1; table[b]["d"] += 1; table[a]["pts"] += 1; table[b]["pts"] += 1
+    for match in _played_group_matches(group, matches):
+        _apply_match_to_table(table, match)
     for row in table.values():
         row["gd"] = row["gf"] - row["ga"]
-    return sorted(table.values(), key=lambda row: (-row["pts"], -row["gd"], -row["gf"], row["team"]))
+    return _rank_group_rows(list(table.values()), group, matches, {team: index for index, team in enumerate(teams)})
+
+
+def _played_group_matches(group, matches):
+    return [match for match in matches if match.get("group") == group and match.get("result")]
+
+
+def _apply_match_to_table(table, match):
+    a, b = match["team_a"], match["team_b"]
+    if a not in table or b not in table:
+        return
+    ga, gb = match.get("goals_a") or 0, match.get("goals_b") or 0
+    table[a]["mp"] += 1; table[b]["mp"] += 1
+    table[a]["gf"] += ga; table[a]["ga"] += gb
+    table[b]["gf"] += gb; table[b]["ga"] += ga
+    if match["result"] == "A_WIN":
+        table[a]["w"] += 1; table[a]["pts"] += 3; table[b]["l"] += 1
+    elif match["result"] == "B_WIN":
+        table[b]["w"] += 1; table[b]["pts"] += 3; table[a]["l"] += 1
+    else:
+        table[a]["d"] += 1; table[b]["d"] += 1; table[a]["pts"] += 1; table[b]["pts"] += 1
+
+
+def _rank_group_rows(rows, group, matches, team_order):
+    output = []
+    point_groups = defaultdict(list)
+    for row in rows:
+        point_groups[row["pts"]].append(row)
+    for points in sorted(point_groups.keys(), reverse=True):
+        output.extend(_break_tie(point_groups[points], group, matches, team_order, allow_h2h=True))
+    return output
+
+
+def _break_tie(rows, group, matches, team_order, allow_h2h=True):
+    if len(rows) <= 1:
+        return rows
+    tied_teams = {row["team"] for row in rows}
+    if allow_h2h:
+        h2h = _head_to_head_stats(group, matches, tied_teams)
+        for key in ("pts", "gd", "gf"):
+            split = _split_by_value(rows, lambda row, key=key: h2h[row["team"]][key])
+            if len(split) > 1:
+                ranked = []
+                for _, group_rows in split:
+                    ranked.extend(_break_tie(group_rows, group, matches, team_order, allow_h2h=True))
+                return ranked
+    for key in ("gd", "gf"):
+        split = _split_by_value(rows, lambda row, key=key: row[key])
+        if len(split) > 1:
+            ranked = []
+            for _, group_rows in split:
+                ranked.extend(_break_tie(group_rows, group, matches, team_order, allow_h2h=False))
+            return ranked
+    return sorted(rows, key=lambda row: (team_order.get(row["team"], 99), row["team"]))
+
+
+def _split_by_value(rows, value_fn):
+    buckets = defaultdict(list)
+    for row in rows:
+        buckets[value_fn(row)].append(row)
+    return [(value, buckets[value]) for value in sorted(buckets.keys(), reverse=True)]
+
+
+def _head_to_head_stats(group, matches, tied_teams):
+    stats = {team: {"pts": 0, "gf": 0, "ga": 0, "gd": 0} for team in tied_teams}
+    for match in _played_group_matches(group, matches):
+        a, b = match["team_a"], match["team_b"]
+        if a not in tied_teams or b not in tied_teams:
+            continue
+        ga, gb = match.get("goals_a") or 0, match.get("goals_b") or 0
+        stats[a]["gf"] += ga; stats[a]["ga"] += gb
+        stats[b]["gf"] += gb; stats[b]["ga"] += ga
+        if match["result"] == "A_WIN":
+            stats[a]["pts"] += 3
+        elif match["result"] == "B_WIN":
+            stats[b]["pts"] += 3
+        else:
+            stats[a]["pts"] += 1; stats[b]["pts"] += 1
+    for row in stats.values():
+        row["gd"] = row["gf"] - row["ga"]
+    return stats
 
 
 def _group_condition_report(group, teams, matches):
     standings = _standings(group, teams, matches)
     if not standings or min(row["mp"] for row in standings) < 2:
         return '<div class="conditions"><strong>Scenario report:</strong> available after every team in this group has played two matches.</div>'
-    remaining = [match for match in matches if match.get("group") == group and not match.get("result")]
+    remaining = _remaining_group_matches(group, matches)
     if not remaining:
         return '<div class="conditions"><strong>Scenario report:</strong> group complete.</div>'
     lines = []
     for team in teams:
         positions = sorted(_possible_positions(team, teams, matches, remaining))
-        lines.append(f"{escape(team)} can finish: {', '.join(str(pos) for pos in positions)} based on remaining win/draw/loss scenarios.")
-    return '<div class="conditions"><strong>Scenario report:</strong><br>' + '<br>'.join(lines) + '<br><small>Tiebreakers applied: goal difference, goals scored, then head-to-head within this tournament. Outcome-only simulations use 1-0 wins and 0-0 draws, so exact goal margins can still change the report.</small></div>'
+        lines.append(f"{escape(team)} can finish: {', '.join(_ordinal(pos) for pos in positions)} based on remaining win/draw/loss scenarios.")
+    return '<div class="conditions"><strong>Scenario report:</strong><br>' + '<br>'.join(lines) + _tiebreaker_note() + '</div>'
 
 
 def _match_condition_report(match, groups, matches):
@@ -1112,26 +1189,167 @@ def _match_condition_report(match, groups, matches):
     teams = groups.get(group) if group else None
     if not teams:
         teams = sorted({team for row in matches if row.get("group") == group for team in (row["team_a"], row["team_b"])})
-    report = _group_condition_report(group, teams, matches)
-    return report.replace('<strong>Scenario report:</strong>', '<strong>Group standing report:</strong>', 1)
+    standings = _standings(group, teams, matches)
+    if not standings or min(row["mp"] for row in standings) < 2:
+        return '<div class="conditions"><strong>Group standing report:</strong> this appears for third group games after every team in the group has played two matches.</div>'
+    remaining = _remaining_group_matches(group, matches)
+    if not remaining:
+        return '<div class="conditions"><strong>Group standing report:</strong> group complete.</div>'
+    if match.get("result"):
+        return _group_condition_report(group, teams, matches).replace('<strong>Scenario report:</strong>', '<strong>Group standing report:</strong>', 1)
+    return _single_match_scenario_report(match, group, teams, matches, remaining)
+
+
+def _remaining_group_matches(group, matches):
+    return sorted([match for match in matches if match.get("group") == group and not match.get("result")], key=lambda item: (_display_group_date_key(item), _time_sort_key(item), item["match_id"]))
+
+
+def _single_match_scenario_report(match, group, teams, matches, remaining):
+    other_matches = [item for item in remaining if item["match_id"] != match["match_id"]]
+    sections = []
+    for outcome in ["A_WIN", "DRAW", "B_WIN"]:
+        rows = []
+        if other_matches:
+            for combo in product(["A_WIN", "DRAW", "B_WIN"], repeat=len(other_matches)):
+                scenario_pairs = [(match, outcome)] + list(zip(other_matches, combo))
+                condition = " and ".join(_outcome_label(other, other_outcome) for other, other_outcome in zip(other_matches, combo))
+                rows.append(f'<li><span class="scenario-condition">With {escape(condition)}:</span> {_score_sensitive_scenario_summary(group, teams, matches, scenario_pairs)}</li>')
+        else:
+            rows.append(f'<li>{_score_sensitive_scenario_summary(group, teams, matches, [(match, outcome)])}</li>')
+        sections.append(f'<div class="scenario-block"><strong>If {escape(_outcome_label(match, outcome))}:</strong><ul>{"".join(rows)}</ul></div>')
+    return '<div class="conditions"><strong>Group standing report:</strong>' + ''.join(sections) + _tiebreaker_note() + '</div>'
+
+
+def _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs):
+    variants = {}
+    option_sets = [_scorelines_for_outcome(match, outcome) for match, outcome in scenario_pairs]
+    for score_combo in product(*option_sets):
+        ranking = _ranking_for_scores(group, teams, matches, {match["match_id"]: score for (match, _), score in zip(scenario_pairs, score_combo)})
+        key = tuple(row["team"] for row in ranking)
+        examples = variants.setdefault(key, [])
+        candidate = tuple((match, score) for (match, _), score in zip(scenario_pairs, score_combo))
+        if len(examples) < 3:
+            examples.append(candidate)
+        else:
+            worst_index = max(range(len(examples)), key=lambda idx: _score_combo_weight(examples[idx]))
+            if _score_combo_weight(candidate) < _score_combo_weight(examples[worst_index]):
+                examples[worst_index] = candidate
+    if len(variants) == 1:
+        return _ranking_sentence_from_key(next(iter(variants)))
+    items = []
+    for key, examples in sorted(variants.items(), key=lambda item: item[0]):
+        best_examples = sorted(examples, key=_score_combo_weight)[:2]
+        example_text = '; '.join(dict.fromkeys(_score_combo_example(example) for example in best_examples))
+        label = 'score example' if ';' not in example_text else 'score examples'
+        items.append(f'<li>{_ranking_sentence_from_key(key)} <span class="scenario-condition">{label}:</span> {escape(example_text)}</li>')
+    return 'Goal difference/goals scored dependent:<ul class="margin-list">' + ''.join(items) + '</ul>'
+
+
+def _ranking_for_scores(group, teams, matches, score_map):
+    simulated = [dict(match) for match in matches]
+    by_id = {match["match_id"]: match for match in simulated}
+    for match_id, score in score_map.items():
+        target = by_id.get(match_id)
+        if not target:
+            continue
+        result, goals_a, goals_b = score
+        target["result"] = result
+        target["goals_a"] = goals_a
+        target["goals_b"] = goals_b
+    return _standings(group, teams, simulated)
+
+
+def _ranking_for_outcomes(group, teams, matches, outcome_map):
+    score_map = {}
+    by_id = {match["match_id"]: match for match in matches}
+    for match_id, outcome in outcome_map.items():
+        match = by_id.get(match_id)
+        if match:
+            score_map[match_id] = _scorelines_for_outcome(match, outcome)[0]
+    return _ranking_for_scores(group, teams, matches, score_map)
+
+
+def _ranking_sentence(ranking):
+    return ', '.join(f'{index}. {escape(row["team"])}' for index, row in enumerate(ranking, start=1))
+
+
+def _ranking_sentence_from_key(ranking_key):
+    return ', '.join(f'{index}. {escape(team)}' for index, team in enumerate(ranking_key, start=1))
+
+
+def _scorelines_for_outcome(match, outcome, max_goals=10):
+    if outcome == "DRAW":
+        return [("DRAW", goals, goals) for goals in range(max_goals + 1)]
+    if outcome == "A_WIN":
+        return [("A_WIN", goals_a, goals_b) for goals_a in range(1, max_goals + 1) for goals_b in range(goals_a)]
+    return [("B_WIN", goals_a, goals_b) for goals_b in range(1, max_goals + 1) for goals_a in range(goals_b)]
+
+
+def _scorelines_for_match(match, max_goals=10):
+    return [score for outcome in ("A_WIN", "DRAW", "B_WIN") for score in _scorelines_for_outcome(match, outcome, max_goals)]
+
+
+def _score_combo_weight(combo):
+    return sum((goals_a + goals_b) * 10 + abs(goals_a - goals_b) for _, (_, goals_a, goals_b) in combo)
+
+
+def _score_combo_example(combo):
+    return '; '.join(_scoreline_label(match, score) for match, score in combo)
+
+
+def _scoreline_label(match, score):
+    _, goals_a, goals_b = score
+    return f'{match["team_a"]} {goals_a}-{goals_b} {match["team_b"]}'
+
+
+def _outcome_label(match, outcome):
+    if outcome == "A_WIN":
+        return f'{match["team_a"]} wins'
+    if outcome == "B_WIN":
+        return f'{match["team_b"]} wins'
+    return f'{match["team_a"]} and {match["team_b"]} draw'
+
+
+def _ordinal(number):
+    suffix = "th" if 10 <= number % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(number % 10, "th")
+    return f"{number}{suffix}"
+
+
+def _tiebreaker_note():
+    return '<br><small>Tiebreakers modeled here: points, head-to-head points/goal difference/goals scored among tied teams, mini-league reapplication for unresolved multi-team ties, then overall goal difference and goals scored. Fair play and FIFA ranking data are not in this dashboard, so ties that reach those steps are shown with the deterministic dashboard order. Margin checks test scorelines through 10 goals for unplayed games; extreme scorelines beyond that can still alter goal-difference or goals-scored cases.</small>'
 
 
 def _possible_positions(team, teams, matches, remaining):
     positions = set()
-    outcomes = ["A_WIN", "DRAW", "B_WIN"]
-    for combo in product(outcomes, repeat=len(remaining)):
-        simulated = [dict(match) for match in matches]
-        by_id = {match["match_id"]: match for match in simulated}
-        for match, outcome in zip(remaining, combo):
-            target = by_id[match["match_id"]]
-            target["result"] = outcome
-            target["goals_a"] = 1 if outcome == "A_WIN" else 0
-            target["goals_b"] = 1 if outcome == "B_WIN" else 0
-        table = _standings(remaining[0]["group"], teams, simulated)
-        for index, row in enumerate(table, start=1):
+    option_sets = [_scorelines_for_match(match) for match in remaining]
+    for combo in product(*option_sets):
+        ranking = _ranking_for_scores(remaining[0]["group"], teams, matches, {match["match_id"]: score for match, score in zip(remaining, combo)})
+        for index, row in enumerate(ranking, start=1):
             if row["team"] == team:
                 positions.add(index)
     return positions
+
+
+def _clinched_group_slots(groups, matches):
+    slot_map = {}
+    for group, teams in groups.items():
+        remaining = _remaining_group_matches(group, matches)
+        if not remaining:
+            standings = _standings(group, teams, matches)
+            for index, row in enumerate(standings, start=1):
+                if index in (1, 2):
+                    slot_map[f"{index}{group}"] = row["team"]
+            continue
+        standings = _standings(group, teams, matches)
+        if not standings or min(row["mp"] for row in standings) < 2:
+            continue
+        for team in teams:
+            positions = _possible_positions(team, teams, matches, remaining)
+            if len(positions) == 1:
+                position = next(iter(positions))
+                if position in (1, 2):
+                    slot_map[f"{position}{group}"] = team
+    return slot_map
 
 
 if __name__ == "__main__":
