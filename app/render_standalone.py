@@ -595,7 +595,7 @@ def render_standalone_dashboard() -> str:
     leaderboard_rows = "\n".join(_leaderboard_json_row_html(row) for row in leaderboard_snapshots["snapshots"][0]["rows"])
     group_matches = [match for match in data["matches"] if match["stage"] == "group"]
     report_match_ids = _final_group_match_ids(group_matches)
-    match_sections = "\n".join(_date_section(date, matches, result["match_impacts"], leaderboard_order, report_match_ids) for date, matches in matches_by_date.items())
+    match_sections = "\n".join(_date_section(date, matches, result["match_impacts"], leaderboard_order, report_match_ids, groups, data["matches"]) for date, matches in matches_by_date.items())
     standings_sections = "\n".join(_group_card(group, teams, data["matches"]) for group, teams in groups.items())
     bracket_points = {(row["user_id"], row["match_id"]): row["total_points"] for row in result["breakdowns"]}
     user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points)
@@ -818,9 +818,9 @@ def _display_date(date):
     return f"{int(month)}/{int(day)}"
 
 
-def _date_section(date, matches, impacts, leaderboard_order, report_match_ids):
+def _date_section(date, matches, impacts, leaderboard_order, report_match_ids, groups, all_matches):
     cards = "\n".join(
-        _match_card(match, impacts[match["match_id"]], leaderboard_order, show_group_report=match["match_id"] in report_match_ids)
+        _match_card(match, impacts[match["match_id"]], leaderboard_order, show_group_report=match["match_id"] in report_match_ids, groups=groups, all_matches=all_matches)
         for match in matches
     )
     return f"""<section class="date-group"><h3>{escape(_display_date(date))}</h3><div class="match-grid">{cards}</div></section>"""
@@ -874,7 +874,7 @@ def _round_section(label, matches, impacts, leaderboard_order):
     return f"""<section class="round-card"><h3>{escape(label)} <span>{point_label}</span></h3><div class="round-grid">{cards}</div></section>"""
 
 
-def _match_card(match, impacts, leaderboard_order, show_group_report=False):
+def _match_card(match, impacts, leaderboard_order, show_group_report=False, groups=None, all_matches=None):
     result = match.get("result") or "Not played"
     if match.get("goals_a") is not None and match.get("goals_b") is not None:
         live_teams = f"{match['team_a']} {match['goals_a']} - {match['goals_b']} {match['team_b']}"
@@ -897,7 +897,7 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False):
         )
         rows.append(f"""<div class="impact-cell name" data-impact-user="{escape(user_id)}">{escape(name)}</div>{cells}""")
     headers = "\n".join(f'<div class="impact-cell impact-head {_scenario_class(match, scenario)}" data-scenario="{escape(scenario)}">{escape(_scenario_label(match, scenario))}</div>' for scenario in scenarios)
-    condition_report = _match_condition_report(match) if show_group_report else ""
+    condition_report = _match_condition_report(match, groups or {}, all_matches or []) if show_group_report else ""
     stage = f"Group {escape(match.get('group', ''))}" if match["stage"] == "group" else escape(match.get("round_label", match["stage"]))
     meta_parts = [match.get("venue", "Venue TBD"), match.get("kickoff_et")]
     venue = f'<p class="venue">{escape(" · ".join(part for part in meta_parts if part))}</p>'
@@ -1107,8 +1107,13 @@ def _group_condition_report(group, teams, matches):
     return '<div class="conditions"><strong>Scenario report:</strong><br>' + '<br>'.join(lines) + '<br><small>Tiebreakers applied: goal difference, goals scored, then head-to-head within this tournament. Outcome-only simulations use 1-0 wins and 0-0 draws, so exact goal margins can still change the report.</small></div>'
 
 
-def _match_condition_report(match):
-    return '<div class="conditions"><strong>Group standing report:</strong> this appears for third group games after every team in the group has played two matches.</div>'
+def _match_condition_report(match, groups, matches):
+    group = match.get("group")
+    teams = groups.get(group) if group else None
+    if not teams:
+        teams = sorted({team for row in matches if row.get("group") == group for team in (row["team_a"], row["team_b"])})
+    report = _group_condition_report(group, teams, matches)
+    return report.replace('<strong>Scenario report:</strong>', '<strong>Group standing report:</strong>', 1)
 
 
 def _possible_positions(team, teams, matches, remaining):
