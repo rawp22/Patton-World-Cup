@@ -591,9 +591,9 @@
     "date": "2026-06-21",
     "team_a": "Spain",
     "team_b": "Saudi Arabia",
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 4,
+    "goals_b": 0,
     "venue": "Mercedes-Benz Stadium, Atlanta",
     "kickoff_et": "12:00 ET"
   },
