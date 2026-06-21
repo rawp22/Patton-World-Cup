@@ -1212,11 +1212,14 @@ def _single_match_scenario_report(match, group, teams, matches, remaining):
         if other_matches:
             for combo in product(["A_WIN", "DRAW", "B_WIN"], repeat=len(other_matches)):
                 scenario_pairs = [(match, outcome)] + list(zip(other_matches, combo))
-                condition = " and ".join(_outcome_label(other, other_outcome) for other, other_outcome in zip(other_matches, combo))
-                rows.append(f'<li><span class="scenario-condition">With {escape(condition)}:</span> {_score_sensitive_scenario_summary(group, teams, matches, scenario_pairs)}</li>')
+                summary, is_dependent = _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs)
+                condition = " and ".join(_outcome_label(other, other_outcome, noun_form=True) for other, other_outcome in zip(other_matches, combo))
+                rows.append((is_dependent, _outcome_sort_key(combo), f'<li><span class="scenario-condition">With {escape(condition)}:</span> {summary}</li>'))
+            rows_html = ''.join(row for _, _, row in sorted(rows, key=lambda item: (item[0], item[1])))
         else:
-            rows.append(f'<li>{_score_sensitive_scenario_summary(group, teams, matches, [(match, outcome)])}</li>')
-        sections.append(f'<div class="scenario-block"><strong>If {escape(_outcome_label(match, outcome))}:</strong><ul>{"".join(rows)}</ul></div>')
+            summary, _ = _score_sensitive_scenario_summary(group, teams, matches, [(match, outcome)])
+            rows_html = f'<li>{summary}</li>'
+        sections.append(f'<div class="scenario-block"><strong>If {escape(_outcome_label(match, outcome))}:</strong><ul>{rows_html}</ul></div>')
     return '<div class="conditions"><strong>Group standing report:</strong>' + ''.join(sections) + _tiebreaker_note() + '</div>'
 
 
@@ -1235,14 +1238,14 @@ def _score_sensitive_scenario_summary(group, teams, matches, scenario_pairs):
             if _score_combo_weight(candidate) < _score_combo_weight(examples[worst_index]):
                 examples[worst_index] = candidate
     if len(variants) == 1:
-        return _ranking_sentence_from_key(next(iter(variants)))
+        return _ranking_sentence_from_key(next(iter(variants))), False
     items = []
     for key, examples in sorted(variants.items(), key=lambda item: item[0]):
         best_examples = sorted(examples, key=_score_combo_weight)[:2]
         example_text = '; '.join(dict.fromkeys(_score_combo_example(example) for example in best_examples))
         label = 'score example' if ';' not in example_text else 'score examples'
         items.append(f'<li>{_ranking_sentence_from_key(key)} <span class="scenario-condition">{label}:</span> {escape(example_text)}</li>')
-    return 'Goal difference/goals scored dependent:<ul class="margin-list">' + ''.join(items) + '</ul>'
+    return 'Goal difference/goals scored dependent:<ul class="margin-list">' + ''.join(items) + '</ul>', True
 
 
 def _ranking_for_scores(group, teams, matches, score_map):
@@ -1302,11 +1305,16 @@ def _scoreline_label(match, score):
     return f'{match["team_a"]} {goals_a}-{goals_b} {match["team_b"]}'
 
 
-def _outcome_label(match, outcome):
+def _outcome_sort_key(outcomes):
+    order = {"B_WIN": 0, "DRAW": 1, "A_WIN": 2}
+    return tuple(order.get(outcome, 99) for outcome in outcomes)
+
+
+def _outcome_label(match, outcome, noun_form=False):
     if outcome == "A_WIN":
-        return f'{match["team_a"]} wins'
+        return f'{match["team_a"]} win' if noun_form else f'{match["team_a"]} wins'
     if outcome == "B_WIN":
-        return f'{match["team_b"]} wins'
+        return f'{match["team_b"]} win' if noun_form else f'{match["team_b"]} wins'
     return f'{match["team_a"]} and {match["team_b"]} draw'
 
 
