@@ -52,12 +52,12 @@
   {
     "user_id": "rick",
     "match_id": "G11",
-    "prediction": "A_WIN"
+    "prediction": "DRAW"
   },
   {
     "user_id": "rick",
     "match_id": "G12",
-    "prediction": "A_WIN"
+    "prediction": "B_WIN"
   },
   {
     "user_id": "rick",
