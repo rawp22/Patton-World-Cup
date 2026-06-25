@@ -922,12 +922,12 @@
   {
     "user_id": "maggie",
     "match_id": "G41",
-    "prediction": "A_WIN"
+    "prediction": "B_WIN"
   },
   {
     "user_id": "maggie",
     "match_id": "G42",
-    "prediction": "B_WIN"
+    "prediction": "A_WIN"
   },
   {
     "user_id": "maggie",
@@ -1052,7 +1052,7 @@
   {
     "user_id": "maggie",
     "match_id": "G67",
-    "prediction": "B_WIN"
+    "prediction": "A_WIN"
   },
   {
     "user_id": "maggie",
