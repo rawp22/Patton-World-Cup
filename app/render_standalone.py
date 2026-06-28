@@ -139,10 +139,10 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 
 SCRIPT = """
 const FEEDERS = {
-  K089:['K073','K074'], K090:['K075','K076'], K091:['K077','K078'], K092:['K079','K080'],
-  K093:['K081','K082'], K094:['K083','K084'], K095:['K085','K086'], K096:['K087','K088'],
-  K097:['K089','K090'], K099:['K091','K092'], K098:['K093','K094'], K100:['K095','K096'],
-  K101:['K097','K099'], K102:['K098','K100'], K104:['K101','K102'], K103:['K101','K102']
+  K089:['K074','K077'], K090:['K073','K075'], K091:['K076','K078'], K092:['K079','K080'],
+  K093:['K083','K084'], K094:['K081','K082'], K095:['K086','K088'], K096:['K085','K087'],
+  K097:['K089','K090'], K098:['K093','K094'], K099:['K091','K092'], K100:['K095','K096'],
+  K101:['K097','K098'], K102:['K099','K100'], K104:['K101','K102'], K103:['K101','K102']
 };
 function showTab(tabId) {
   const targetId = tabId || 'matches-tab';
@@ -882,16 +882,16 @@ def _knockout_bracket(knockout_by_round, impacts, leaderboard_order, groups=None
         return [matches[match_id] for match_id in ids if match_id in matches]
 
     left = [
-        ("Round of 32", by_ids("Round of 32", ["K073", "K074", "K075", "K076", "K077", "K078", "K079", "K080"]), [1, 3, 5, 7, 9, 11, 13, 15], 1),
-        ("Round of 16", by_ids("Round of 16", ["K089", "K090", "K091", "K092"]), [2, 6, 10, 14], 2),
-        ("Quarter-finals", by_ids("Quarterfinals", ["K097", "K099"]), [4, 12], 3),
+        ("Round of 32", by_ids("Round of 32", ["K074", "K077", "K073", "K075", "K083", "K084", "K081", "K082"]), [1, 3, 5, 7, 9, 11, 13, 15], 1),
+        ("Round of 16", by_ids("Round of 16", ["K089", "K090", "K093", "K094"]), [2, 6, 10, 14], 2),
+        ("Quarter-finals", by_ids("Quarterfinals", ["K097", "K098"]), [4, 12], 3),
         ("Semi-finals", by_ids("Semifinals", ["K101"]), [8], 4),
     ]
     right = [
         ("Semi-finals", by_ids("Semifinals", ["K102"]), [8], 1),
-        ("Quarter-finals", by_ids("Quarterfinals", ["K098", "K100"]), [4, 12], 2),
-        ("Round of 16", by_ids("Round of 16", ["K093", "K094", "K095", "K096"]), [2, 6, 10, 14], 3),
-        ("Round of 32", by_ids("Round of 32", ["K081", "K082", "K083", "K084", "K085", "K086", "K087", "K088"]), [1, 3, 5, 7, 9, 11, 13, 15], 4),
+        ("Quarter-finals", by_ids("Quarterfinals", ["K099", "K100"]), [4, 12], 2),
+        ("Round of 16", by_ids("Round of 16", ["K091", "K092", "K095", "K096"]), [2, 6, 10, 14], 3),
+        ("Round of 32", by_ids("Round of 32", ["K076", "K078", "K079", "K080", "K086", "K088", "K085", "K087"]), [1, 3, 5, 7, 9, 11, 13, 15], 4),
     ]
     final_html = "".join(_match_card(match, impacts[match["match_id"]], leaderboard_order) for match in by_ids("Final", ["K104"]))
     third_html = "".join(_match_card(match, impacts[match["match_id"]], leaderboard_order) for match in by_ids("Third Place", ["K103"]))
