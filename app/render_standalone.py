@@ -950,6 +950,8 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False, grou
     condition_report = _match_condition_report(match, groups or {}, all_matches or []) if show_group_report else ""
     stage = f"Group {escape(match.get('group', ''))}" if match["stage"] == "group" else escape(match.get("round_label", match["stage"]))
     meta_parts = [match.get("venue", "Venue TBD"), match.get("kickoff_et")]
+    if match["stage"] != "group":
+        meta_parts.insert(0, _display_date(match["date"]))
     venue = f'<p class="venue">{escape(" · ".join(part for part in meta_parts if part))}</p>'
     result_attr = escape(match.get("result") or "")
     reveal_attr = escape(reveal_at)
