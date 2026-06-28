@@ -105,11 +105,12 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .bracket-slot { position:relative; z-index:1; }
 .bracket-slot h4 { display:none; }
 .bracket-slot .match-card { position:relative; z-index:1; overflow:visible; }
-.bracket-slot .match-card[open] { z-index:9000; background:var(--panel); } .bracket-slot .match-card[open] .impact { position:fixed; top:16vh; left:50%; transform:translateX(-50%); width:min(92vw, 760px); max-height:72vh; overflow:auto; background:var(--panel); border:1px solid var(--gold); border-radius:8px; box-shadow:0 24px 70px rgb(35 31 24 / 35%); padding:14px; z-index:10000; }
+.bracket-board:has(.match-card[open]), .bracket-layout:has(.match-card[open]), .bracket-half:has(.match-card[open]), .bracket-center:has(.match-card[open]), .bracket-slot:has(.match-card[open]), .bracket-center-slot:has(.match-card[open]) { position:relative; z-index:20000; overflow:visible; }
+.bracket-board .match-card[open] { z-index:21000; background:var(--panel); isolation:isolate; }
+.bracket-board .match-card[open] .impact { position:fixed; top:12vh; left:50%; transform:translateX(-50%); width:min(92vw, 820px); max-height:78vh; overflow:auto; background:var(--panel); border:2px solid var(--gold); border-radius:8px; box-shadow:0 28px 90px rgb(35 31 24 / 45%); padding:14px; z-index:2147483000; }
 .bracket-center { display:block; overflow:visible; position:relative; z-index:0; padding-top:420px; }
 .bracket-center h4 { text-align:center; color:var(--gold-dark); margin:0 0 5px; } .bracket-center-slot { position:relative; } .bracket-center-slot.final-slot { margin:0; } .bracket-center-slot.third-slot { margin-top:96px; }
 .bracket-center .match-card { position:relative; z-index:0; overflow:visible; }
-.bracket-center .match-card[open] { z-index:9000; background:var(--panel); } .bracket-center .match-card[open] .impact { position:fixed; top:16vh; left:50%; transform:translateX(-50%); width:min(92vw, 760px); max-height:72vh; overflow:auto; background:var(--panel); border:1px solid var(--gold); border-radius:8px; box-shadow:0 24px 70px rgb(35 31 24 / 35%); padding:14px; z-index:10000; }
 .bracket-center .match-card summary { grid-template-columns:1fr; padding:8px 9px; }
 .bracket-half .match-card summary { grid-template-columns:1fr; gap:3px; padding:8px 9px; }
 .bracket-half .stage, .bracket-center .stage { font-size:11px; }
@@ -136,8 +137,8 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 
 SCRIPT = """
 const FEEDERS = {
-  K089:['K073','K075'], K090:['K074','K077'], K091:['K076','K078'], K092:['K079','K080'],
-  K093:['K083','K084'], K094:['K081','K082'], K095:['K086','K088'], K096:['K085','K087'],
+  K089:['K073','K074'], K090:['K075','K076'], K091:['K077','K078'], K092:['K079','K080'],
+  K093:['K081','K082'], K094:['K083','K084'], K095:['K085','K086'], K096:['K087','K088'],
   K097:['K089','K090'], K099:['K091','K092'], K098:['K093','K094'], K100:['K095','K096'],
   K101:['K097','K099'], K102:['K098','K100'], K104:['K101','K102'], K103:['K101','K102']
 };
