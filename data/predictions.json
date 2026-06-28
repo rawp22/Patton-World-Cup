@@ -3958,5 +3958,60 @@
     "user_id": "ryan",
     "match_id": "G72",
     "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "callahan",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K075",
+    "prediction": "A_WIN"
   }
 ]
