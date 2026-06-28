@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import os
 from pathlib import Path
@@ -18,6 +18,9 @@ LEAGUE_ID = os.environ.get("API_FOOTBALL_LEAGUE_ID", "1")
 SEASON = os.environ.get("API_FOOTBALL_SEASON", "2026")
 FINAL_STATUSES = {"FT", "AET", "PEN"}
 EASTERN_OFFSET = "-04:00"
+KNOCKOUT_STAGES = {"R32", "R16", "QF", "SF", "F", "3RD"}
+KNOCKOUT_FETCH_OFFSETS_MINUTES = (120, 125, 130, 150, 180, 210, 240)
+FETCH_WINDOW_MINUTES = 5
 
 ALIASES = {
     "Bosnia and Herzegovina": ["Bosnia-Herzegovina", "Bosnia & Herzegovina"],
@@ -102,7 +105,15 @@ def espn_fixture_result_for_match(match: dict, events: list[dict]) -> tuple[str,
         except (TypeError, ValueError):
             return None
 
-        if home_goals == away_goals:
+        home_winner = home.get("winner")
+        away_winner = away.get("winner")
+        if home_winner is True or str(home_winner).lower() == "true":
+            result_home_away = "HOME_WIN"
+        elif away_winner is True or str(away_winner).lower() == "true":
+            result_home_away = "AWAY_WIN"
+        elif home_goals == away_goals and match.get("stage") in KNOCKOUT_STAGES:
+            return None
+        elif home_goals == away_goals:
             result_home_away = "DRAW"
         elif home_goals > away_goals:
             result_home_away = "HOME_WIN"
@@ -162,12 +173,22 @@ def fixture_result_for_match(match: dict, fixtures: list[dict]) -> tuple[str, in
     return None
 
 
+def should_check_match(match: dict, now: datetime) -> bool:
+    elapsed_minutes = (now - kickoff_dt(match)).total_seconds() / 60
+    if match.get("stage") not in KNOCKOUT_STAGES:
+        return elapsed_minutes >= 120
+    return any(
+        offset <= elapsed_minutes < offset + FETCH_WINDOW_MINUTES
+        for offset in KNOCKOUT_FETCH_OFFSETS_MINUTES
+    )
+
+
 def pending_dates(matches: list[dict], now: datetime) -> dict[str, list[dict]]:
     grouped: dict[str, list[dict]] = defaultdict(list)
     for match in matches:
         if match.get("result") or not match.get("kickoff_et"):
             continue
-        if now >= kickoff_dt(match) + timedelta(hours=2):
+        if should_check_match(match, now):
             grouped[match["date"]].append(match)
     return grouped
 

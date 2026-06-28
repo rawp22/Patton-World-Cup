@@ -420,6 +420,8 @@ const TEAM_ALIASES = {
   'Cape Verde':['Cabo Verde']
 };
 const KNOCKOUT_POINTS = {R32:3, R16:5, QF:8, SF:8, F:10};
+const KNOCKOUT_FETCH_OFFSETS_MINUTES = [120, 125, 130, 150, 180, 210, 240];
+const FETCH_WINDOW_MINUTES = 5;
 function normalizeTeam(value) {
   return (value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -453,8 +455,11 @@ function resultFromEspnEvent(match, event) {
   const homeGoals = Number(home.score), awayGoals = Number(away.score);
   if (!Number.isFinite(homeGoals) || !Number.isFinite(awayGoals)) return null;
   let homeAwayResult = 'DRAW';
-  if (homeGoals > awayGoals) homeAwayResult = 'HOME_WIN';
-  if (awayGoals > homeGoals) homeAwayResult = 'AWAY_WIN';
+  if (home.winner === true || home.winner === 'true') homeAwayResult = 'HOME_WIN';
+  else if (away.winner === true || away.winner === 'true') homeAwayResult = 'AWAY_WIN';
+  else if (homeGoals === awayGoals && KNOCKOUT_POINTS[match.stage]) return null;
+  else if (homeGoals > awayGoals) homeAwayResult = 'HOME_WIN';
+  else if (awayGoals > homeGoals) homeAwayResult = 'AWAY_WIN';
   const result = direct
     ? {HOME_WIN:'A_WIN', AWAY_WIN:'B_WIN', DRAW:'DRAW'}[homeAwayResult]
     : {HOME_WIN:'B_WIN', AWAY_WIN:'A_WIN', DRAW:'DRAW'}[homeAwayResult];
@@ -578,7 +583,7 @@ async function fetchClientResults() {
   const data = window.CLIENT_DATA;
   if (!data?.matches?.length) return;
   const now = Date.now();
-  const pending = data.matches.filter(match => !match.result && match.kickoff_et && kickoffDate(match) && now >= kickoffDate(match).getTime() + 2 * 60 * 60 * 1000);
+  const pending = data.matches.filter(match => !match.result && match.kickoff_et && shouldClientFetchMatch(match, now));
   const dates = [...new Set(pending.map(match => match.date))];
   let changed = false;
   for (const date of dates) {
@@ -600,6 +605,13 @@ async function fetchClientResults() {
     applyLeaderboardSpoilerMode();
   }
 }
+function shouldClientFetchMatch(match, now) {
+  const kickoff = kickoffDate(match);
+  if (!kickoff) return false;
+  const elapsedMinutes = (now - kickoff.getTime()) / 60000;
+  if (!KNOCKOUT_POINTS[match.stage]) return elapsedMinutes >= 120;
+  return KNOCKOUT_FETCH_OFFSETS_MINUTES.some(offset => elapsedMinutes >= offset && elapsedMinutes < offset + FETCH_WINDOW_MINUTES);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const initial = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
@@ -607,6 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyMatchSpoilers();
   applyLeaderboardSpoilerMode();
   fetchClientResults();
+  window.setInterval(fetchClientResults, 5 * 60 * 1000);
 });
 window.addEventListener('hashchange', () => {
   const target = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
