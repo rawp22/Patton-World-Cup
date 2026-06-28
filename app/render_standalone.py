@@ -105,9 +105,11 @@ button:hover { border-color:var(--gold); color:var(--gold-dark); }
 .bracket-slot { position:relative; z-index:1; }
 .bracket-slot h4 { display:none; }
 .bracket-slot .match-card { position:relative; z-index:1; overflow:visible; }
-.bracket-board:has(.match-card[open]), .bracket-layout:has(.match-card[open]), .bracket-half:has(.match-card[open]), .bracket-center:has(.match-card[open]), .bracket-slot:has(.match-card[open]), .bracket-center-slot:has(.match-card[open]) { position:relative; z-index:20000; overflow:visible; }
-.bracket-board .match-card[open] { z-index:21000; background:var(--panel); isolation:isolate; }
-.bracket-board .match-card[open] .impact { position:fixed; top:12vh; left:50%; transform:translateX(-50%); width:min(92vw, 820px); max-height:78vh; overflow:auto; background:var(--panel); border:2px solid var(--gold); border-radius:8px; box-shadow:0 28px 90px rgb(35 31 24 / 45%); padding:14px; z-index:2147483000; }
+.bracket-board .match-card[open] { z-index:10; background:var(--panel); }
+.knockout-impact-layer { position:fixed; inset:0; z-index:2147483000; pointer-events:none; }
+.knockout-impact-layer .impact { position:absolute; top:12vh; left:50%; transform:translateX(-50%); width:min(92vw, 820px); max-height:78vh; overflow:auto; background:var(--panel); border:2px solid var(--gold); border-radius:8px; box-shadow:0 28px 90px rgb(35 31 24 / 45%); padding:14px; pointer-events:auto; }
+body.knockout-modal-open { overflow:hidden; }
+body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card-highlight) { opacity:.18; }
 .bracket-center { display:block; overflow:visible; position:relative; z-index:0; padding-top:420px; }
 .bracket-center h4 { text-align:center; color:var(--gold-dark); margin:0 0 5px; } .bracket-center-slot { position:relative; } .bracket-center-slot.final-slot { margin:0; } .bracket-center-slot.third-slot { margin-top:96px; }
 .bracket-center .match-card { position:relative; z-index:0; overflow:visible; }
@@ -159,6 +161,38 @@ function showTab(tabId) {
     panel.style.display = selected ? (panel.classList.contains('standings') ? 'grid' : 'block') : 'none';
   });
 }
+const knockoutOverlayState = {card:null, impact:null, parent:null, next:null};
+function knockoutOverlayLayer() {
+  let layer = document.querySelector('.knockout-impact-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.className = 'knockout-impact-layer';
+    layer.setAttribute('aria-hidden', 'false');
+    document.body.appendChild(layer);
+  }
+  return layer;
+}
+function detachKnockoutImpact() {
+  if (!knockoutOverlayState.impact) {
+    document.body.classList.remove('knockout-modal-open');
+    return;
+  }
+  const {impact, parent, next} = knockoutOverlayState;
+  if (parent) parent.insertBefore(impact, next || null);
+  Object.assign(knockoutOverlayState, {card:null, impact:null, parent:null, next:null});
+  document.querySelector('.knockout-impact-layer')?.remove();
+  document.body.classList.remove('knockout-modal-open');
+}
+function attachKnockoutImpact(card) {
+  if (!card || !card.matches('#knockout-tab .match-card')) return;
+  const impact = card.querySelector('.impact');
+  if (!impact) return;
+  if (knockoutOverlayState.impact === impact) return;
+  detachKnockoutImpact();
+  Object.assign(knockoutOverlayState, {card, impact, parent:impact.parentNode, next:impact.nextSibling});
+  knockoutOverlayLayer().appendChild(impact);
+  document.body.classList.add('knockout-modal-open');
+}
 function clearFeederHighlights() {
   document.querySelectorAll('.bracket-card-highlight').forEach(card => card.classList.remove('bracket-card-highlight'));
 }
@@ -190,8 +224,9 @@ document.querySelectorAll('.tab-button').forEach(control => {
 
 document.addEventListener('click', event => {
   const openKnockoutCard = document.querySelector('#knockout-tab .match-card[open]');
-  if (openKnockoutCard && !event.target.closest('#knockout-tab .match-card[open]')) {
+  if (openKnockoutCard && !event.target.closest('#knockout-tab .match-card[open]') && !event.target.closest('.knockout-impact-layer .impact')) {
     openKnockoutCard.open = false;
+    detachKnockoutImpact();
     clearFeederHighlights();
   }
   const expandButton = event.target.closest('[data-expand-target]');
@@ -204,6 +239,7 @@ document.addEventListener('click', event => {
   if (collapseButton) {
     event.preventDefault();
     document.querySelectorAll(collapseButton.dataset.collapseTarget).forEach(card => card.open = false);
+    detachKnockoutImpact();
     clearFeederHighlights();
     return;
   }
@@ -235,8 +271,9 @@ document.addEventListener('click', event => {
 
 document.addEventListener('touchend', event => {
   const openKnockoutCard = document.querySelector('#knockout-tab .match-card[open]');
-  if (openKnockoutCard && !event.target.closest('#knockout-tab .match-card[open]')) {
+  if (openKnockoutCard && !event.target.closest('#knockout-tab .match-card[open]') && !event.target.closest('.knockout-impact-layer .impact')) {
     openKnockoutCard.open = false;
+    detachKnockoutImpact();
     clearFeederHighlights();
   }
 }, false);
@@ -246,6 +283,9 @@ document.addEventListener('toggle', event => {
   if (event.target.open) {
     collapseOtherKnockoutCards(event.target);
     highlightFeeders(event.target.dataset.matchId);
+    attachKnockoutImpact(event.target);
+  } else if (knockoutOverlayState.card === event.target) {
+    detachKnockoutImpact();
   }
 }, true);
 
