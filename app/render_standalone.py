@@ -141,6 +141,7 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .user-ko-title { position:absolute; top:8px; left:0; right:0; text-align:center; font-weight:950; text-transform:uppercase; letter-spacing:1px; color:#ffd04a; font-size:clamp(13px,2.2vw,22px); pointer-events:none; }
 .mini-flag-pick { justify-self:center; align-self:center; width:34px; height:25px; display:flex; align-items:center; justify-content:center; position:relative; border-radius:4px; }
 .mini-flag-pick .flag-icon { width:34px; height:25px; border-color:#33427f; box-shadow:0 0 0 1px rgb(255 255 255 / 20%); }
+.mini-flag-pick.earned .flag-icon { border:3px solid #20b15a; box-shadow:0 0 0 1px #fff, 0 0 10px rgb(32 177 90 / 70%); }
 .mini-flag-pick.blank { border:1px dashed rgb(255 255 255 / 22%); }
 .mini-flag-pick.eliminated::before, .mini-flag-pick.eliminated::after { content:""; position:absolute; left:-5px; right:-5px; top:50%; height:5px; background:#050505; border-radius:999px; box-shadow:0 0 0 1px #fff, 0 1px 4px rgb(0 0 0 / 45%); pointer-events:none; z-index:3; }
 .mini-flag-pick.eliminated::before { transform:translateY(-50%) rotate(34deg); }
@@ -1177,12 +1178,12 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
         flags = []
         for index, match_id in enumerate(r32_left, 1):
             match = matches_by_id.get(match_id, {})
-            flags.append((match.get("team_a"), 1, 2 * index - 1, 1))
-            flags.append((match.get("team_b"), 1, 2 * index, 1))
+            flags.append((match_id, match.get("team_a"), 1, 2 * index - 1, 1))
+            flags.append((match_id, match.get("team_b"), 1, 2 * index, 1))
         for index, match_id in enumerate(r32_right, 1):
             match = matches_by_id.get(match_id, {})
-            flags.append((match.get("team_a"), 9, 2 * index - 1, 1))
-            flags.append((match.get("team_b"), 9, 2 * index, 1))
+            flags.append((match_id, match.get("team_a"), 9, 2 * index - 1, 1))
+            flags.append((match_id, match.get("team_b"), 9, 2 * index, 1))
         return flags
 
     layout = picked_layout()
@@ -1194,12 +1195,15 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
             body = '<p class="user-ko-pending">Knockout picks pending.</p>'
         else:
             flags = []
-            for team, col, row, span in starter_flags():
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", mark_eliminated=False))
+            for match_id, team, col, row, span in starter_flags():
+                prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
+                earned = _earned_pick_class(matches_by_id.get(match_id, {}), prediction, team, matches_by_id)
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=earned, mark_eliminated=False))
             for match_id, col, row, span in layout:
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};"))
+                earned = _earned_pick_class(matches_by_id.get(match_id, {}), prediction, team, matches_by_id)
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=earned))
             champion = prediction_rows_by_user_match.get((user_id, "K104"), {}).get("predicted_team")
             third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("predicted_team")
             other_third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("third_place_other")
@@ -1214,6 +1218,16 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
   {body}
 </details>''')
     return ''.join(sections)
+
+
+def _earned_pick_class(match, prediction, team, matches_by_id):
+    if not match or not match.get("result") or not prediction or not team:
+        return ""
+    if prediction.get("predicted_team") != team or prediction.get("prediction") != match.get("result"):
+        return ""
+    teams = _render_match_team_sets(match, matches_by_id)
+    winner = teams["a"] if match.get("result") == "A_WIN" else teams["b"]
+    return "earned" if team in winner else ""
 
 
 def _mini_ko_flag(team, matches_by_id, style='', extra_class='', mark_eliminated=True):
