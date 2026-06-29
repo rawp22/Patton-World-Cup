@@ -142,13 +142,15 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .mini-flag-pick { justify-self:center; align-self:center; width:34px; height:25px; display:flex; align-items:center; justify-content:center; position:relative; border-radius:4px; }
 .mini-flag-pick .flag-icon { width:34px; height:25px; border-color:#33427f; box-shadow:0 0 0 1px rgb(255 255 255 / 20%); }
 .mini-flag-pick.blank { border:1px dashed rgb(255 255 255 / 22%); }
-.mini-flag-pick.eliminated::after { content:"X"; position:absolute; inset:-5px; display:flex; align-items:center; justify-content:center; color:#050505; font-weight:1000; font-size:32px; line-height:1; text-shadow:0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff; transform:rotate(-8deg); }
+.mini-flag-pick.eliminated::before, .mini-flag-pick.eliminated::after { content:""; position:absolute; left:-5px; right:-5px; top:50%; height:5px; background:#050505; border-radius:999px; box-shadow:0 0 0 1px #fff, 0 1px 4px rgb(0 0 0 / 45%); pointer-events:none; z-index:3; }
+.mini-flag-pick.eliminated::before { transform:translateY(-50%) rotate(34deg); }
+.mini-flag-pick.eliminated::after { transform:translateY(-50%) rotate(-34deg); }
 .user-ko-center { grid-column:5; grid-row:3 / span 4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:#ffd04a; font-weight:950; text-align:center; }
 .user-ko-cup { font-size:42px; line-height:1; }
 .user-ko-champion { transform:scale(1.35); margin:4px 0; }
 .user-ko-third { position:absolute; left:42%; right:42%; bottom:9px; display:flex; gap:8px; align-items:center; justify-content:center; }
 .user-ko-pending { padding:0 14px 14px; color:var(--muted); }
-@media (orientation:landscape) and (max-width:950px) { .user-ko-board { min-height:260px; padding:6px; gap:1px 5px; } .mini-flag-pick, .mini-flag-pick .flag-icon { width:24px; height:18px; } .mini-flag-pick.eliminated::after { font-size:23px; inset:-4px; } .user-ko-cup { font-size:30px; } .user-ko-title { top:5px; font-size:14px; } }
+@media (orientation:landscape) and (max-width:950px) { .user-ko-board { min-height:260px; padding:6px; gap:1px 5px; } .mini-flag-pick, .mini-flag-pick .flag-icon { width:24px; height:18px; } .mini-flag-pick.eliminated::before, .mini-flag-pick.eliminated::after { left:-4px; right:-4px; height:4px; } .user-ko-cup { font-size:30px; } .user-ko-title { top:5px; font-size:14px; } }
 
 @media (max-width:720px) { .topbar { align-items:start; flex-direction:column; } .hash { text-align:left; } .match-card summary { grid-template-columns:1fr; } .result { justify-self:start; } .impact-grid { grid-template-columns:1fr; } .impact-cell { border-left:0; } .pick-row { grid-template-columns:minmax(0,1fr) 42px; } .pick { text-align:left; } }
 """
