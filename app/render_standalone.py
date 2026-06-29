@@ -137,7 +137,7 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .user-knockout-brackets { display:grid; gap:12px; margin-top:24px; }
 .user-ko-bracket { overflow:hidden; }
 .user-ko-bracket summary { display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; font-weight:900; color:var(--gold-dark); }
-.user-ko-board { margin:0 12px 12px; background:#101858; border-radius:8px; color:#ffd04a; padding:10px; aspect-ratio:16/9; min-height:300px; display:grid; grid-template-columns:repeat(9, minmax(0,1fr)); grid-template-rows:repeat(8, minmax(0,1fr)); gap:4px 8px; position:relative; overflow:hidden; }
+.user-ko-board { margin:0 12px 12px; background:#101858; border-radius:8px; color:#ffd04a; padding:10px; aspect-ratio:16/9; min-height:330px; display:grid; grid-template-columns:repeat(9, minmax(0,1fr)); grid-template-rows:repeat(16, minmax(0,1fr)); gap:2px 8px; position:relative; overflow:hidden; }
 .user-ko-title { position:absolute; top:8px; left:0; right:0; text-align:center; font-weight:950; text-transform:uppercase; letter-spacing:1px; color:#ffd04a; font-size:clamp(13px,2.2vw,22px); pointer-events:none; }
 .mini-flag-pick { justify-self:center; align-self:center; width:34px; height:25px; display:flex; align-items:center; justify-content:center; position:relative; border-radius:4px; }
 .mini-flag-pick .flag-icon { width:34px; height:25px; border-color:#33427f; box-shadow:0 0 0 1px rgb(255 255 255 / 20%); }
@@ -148,7 +148,7 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .user-ko-champion { transform:scale(1.35); margin:4px 0; }
 .user-ko-third { position:absolute; left:42%; right:42%; bottom:9px; display:flex; gap:8px; align-items:center; justify-content:center; }
 .user-ko-pending { padding:0 14px 14px; color:var(--muted); }
-@media (orientation:landscape) and (max-width:950px) { .user-ko-board { min-height:250px; padding:6px; gap:2px 5px; } .mini-flag-pick, .mini-flag-pick .flag-icon { width:27px; height:20px; } .mini-flag-pick.eliminated::after { font-size:25px; inset:-4px; } .user-ko-cup { font-size:30px; } .user-ko-title { top:5px; font-size:14px; } }
+@media (orientation:landscape) and (max-width:950px) { .user-ko-board { min-height:260px; padding:6px; gap:1px 5px; } .mini-flag-pick, .mini-flag-pick .flag-icon { width:24px; height:18px; } .mini-flag-pick.eliminated::after { font-size:23px; inset:-4px; } .user-ko-cup { font-size:30px; } .user-ko-title { top:5px; font-size:14px; } }
 
 @media (max-width:720px) { .topbar { align-items:start; flex-direction:column; } .hash { text-align:left; } .match-card summary { grid-template-columns:1fr; } .result { justify-self:start; } .impact-grid { grid-template-columns:1fr; } .impact-cell { border-left:0; } .pick-row { grid-template-columns:minmax(0,1fr) 42px; } .pick { text-align:left; } }
 """
@@ -488,6 +488,14 @@ async function fetchEspnDate(date) {
   const payload = await response.json();
   return payload.events || [];
 }
+function shiftedDate(date, offsetDays) {
+  const value = new Date(`${date}T12:00:00Z`);
+  value.setUTCDate(value.getUTCDate() + offsetDays);
+  return value.toISOString().slice(0, 10);
+}
+function espnLookupDates(match) {
+  return [...new Set([match.date, shiftedDate(match.date, -1), shiftedDate(match.date, 1)])];
+}
 function winnerFor(match) {
   if (match.result === 'A_WIN') return match.team_a;
   if (match.result === 'B_WIN') return match.team_b;
@@ -633,12 +641,12 @@ async function fetchClientResults() {
   if (!data?.matches?.length) return;
   const now = Date.now();
   const pending = data.matches.filter(match => !match.result && match.kickoff_et && shouldClientFetchMatch(match, now));
-  const dates = [...new Set(pending.map(match => match.date))];
+  const dates = [...new Set(pending.flatMap(match => espnLookupDates(match)))];
   let changed = false;
   for (const date of dates) {
     let events = [];
     try { events = await fetchEspnDate(date); } catch (_) { events = []; }
-    pending.filter(match => match.date === date).forEach(match => {
+    pending.filter(match => espnLookupDates(match).includes(date)).forEach(match => {
       for (const event of events) {
         const result = resultFromEspnEvent(match, event);
         if (!result) continue;
@@ -659,7 +667,7 @@ function shouldClientFetchMatch(match, now) {
   if (!kickoff) return false;
   const elapsedMinutes = (now - kickoff.getTime()) / 60000;
   if (!KNOCKOUT_POINTS[match.stage]) return elapsedMinutes >= 120;
-  return KNOCKOUT_FETCH_OFFSETS_MINUTES.some(offset => elapsedMinutes >= offset && elapsedMinutes < offset + FETCH_WINDOW_MINUTES);
+  return elapsedMinutes >= 120;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1149,28 +1157,47 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
     r16_right = ["K091", "K092", "K095", "K096"]
     qf_right = ["K099", "K100"]
     sf_right = ["K102"]
-    layout = []
-    layout += [(match_id, 1, row) for row, match_id in enumerate(r32_left, 1)]
-    layout += [(match_id, 2, row) for row, match_id in zip([1, 3, 5, 7], r16_left)]
-    layout += [(match_id, 3, row) for row, match_id in zip([2, 6], qf_left)]
-    layout += [(match_id, 4, 4) for match_id in sf_left]
-    layout += [(match_id, 6, 4) for match_id in sf_right]
-    layout += [(match_id, 7, row) for row, match_id in zip([2, 6], qf_right)]
-    layout += [(match_id, 8, row) for row, match_id in zip([1, 3, 5, 7], r16_right)]
-    layout += [(match_id, 9, row) for row, match_id in enumerate(r32_right, 1)]
     matches_by_id = {match["match_id"]: match for match in matches}
+
+    def picked_layout():
+        layout = []
+        layout += [(match_id, 2, 2 * index - 1, 2) for index, match_id in enumerate(r32_left, 1)]
+        layout += [(match_id, 3, row, 4) for row, match_id in zip([1, 5, 9, 13], r16_left)]
+        layout += [(match_id, 4, row, 8) for row, match_id in zip([1, 9], qf_left)]
+        layout += [(match_id, 4, 1, 16) for match_id in sf_left]
+        layout += [(match_id, 6, 1, 16) for match_id in sf_right]
+        layout += [(match_id, 6, row, 8) for row, match_id in zip([1, 9], qf_right)]
+        layout += [(match_id, 7, row, 4) for row, match_id in zip([1, 5, 9, 13], r16_right)]
+        layout += [(match_id, 8, 2 * index - 1, 2) for index, match_id in enumerate(r32_right, 1)]
+        return layout
+
+    def starter_flags():
+        flags = []
+        for index, match_id in enumerate(r32_left, 1):
+            match = matches_by_id.get(match_id, {})
+            flags.append((match.get("team_a"), 1, 2 * index - 1, 1))
+            flags.append((match.get("team_b"), 1, 2 * index, 1))
+        for index, match_id in enumerate(r32_right, 1):
+            match = matches_by_id.get(match_id, {})
+            flags.append((match.get("team_a"), 9, 2 * index - 1, 1))
+            flags.append((match.get("team_b"), 9, 2 * index, 1))
+        return flags
+
+    layout = picked_layout()
     sections = []
     for user_id in leaderboard_order:
         user = users_by_id[user_id]
-        has_knockout = any((user_id, match_id) in prediction_rows_by_user_match for match_id, _, _ in layout)
+        has_knockout = any((user_id, match_id) in prediction_rows_by_user_match for match_id, _, _, _ in layout)
         if not has_knockout:
             body = '<p class="user-ko-pending">Knockout picks pending.</p>'
         else:
             flags = []
-            for match_id, col, row in layout:
+            for team, col, row, span in starter_flags():
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};"))
+            for match_id, col, row, span in layout:
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row};"))
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};"))
             champion = prediction_rows_by_user_match.get((user_id, "K104"), {}).get("predicted_team")
             third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("predicted_team")
             other_third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("third_place_other")

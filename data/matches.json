@@ -986,9 +986,9 @@
     "team_b": "Japan",
     "venue": "NRG Stadium, Houston",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 1,
     "kickoff_et": "13:00 ET"
   },
   {
