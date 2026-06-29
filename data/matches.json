@@ -958,9 +958,10 @@
     "team_b": "Paraguay",
     "venue": "Gillette Stadium, Boston",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 1,
+    "result_note": "Paraguay wins on PKs",
     "kickoff_et": "16:30 ET"
   },
   {

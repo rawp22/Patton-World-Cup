@@ -621,7 +621,8 @@ function updateClientMatchCard(match) {
   if (!card) return;
   card.dataset.result = match.result || '';
   const liveTeams = card.querySelector('.live-teams');
-  if (liveTeams) liveTeams.textContent = `${match.team_a} ${match.goals_a} - ${match.goals_b} ${match.team_b}`;
+  const note = match.result_note ? ` (${match.result_note})` : '';
+  if (liveTeams) liveTeams.textContent = `${match.team_a} ${match.goals_a} - ${match.goals_b} ${match.team_b}${note}`;
   const notPlayed = card.querySelector('.not-played');
   if (notPlayed) notPlayed.hidden = true;
   const button = card.querySelector('[data-update-match]');
@@ -1003,7 +1004,8 @@ def _round_section(label, matches, impacts, leaderboard_order):
 def _match_card(match, impacts, leaderboard_order, show_group_report=False, groups=None, all_matches=None):
     result = match.get("result") or "Not played"
     if match.get("goals_a") is not None and match.get("goals_b") is not None:
-        live_teams = f"{match['team_a']} {match['goals_a']} - {match['goals_b']} {match['team_b']}"
+        note = f" ({match['result_note']})" if match.get("result_note") else ""
+        live_teams = f"{match['team_a']} {match['goals_a']} - {match['goals_b']} {match['team_b']}{note}"
     else:
         live_teams = f"{match['team_a']} vs {match['team_b']}"
     default_teams = f"{match['team_a']} vs {match['team_b']}"
