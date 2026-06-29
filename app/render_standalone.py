@@ -1195,7 +1195,7 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
         else:
             flags = []
             for team, col, row, span in starter_flags():
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};"))
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", mark_eliminated=False))
             for match_id, col, row, span in layout:
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
@@ -1216,10 +1216,10 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
     return ''.join(sections)
 
 
-def _mini_ko_flag(team, matches_by_id, style='', extra_class=''):
+def _mini_ko_flag(team, matches_by_id, style='', extra_class='', mark_eliminated=True):
     if not team:
         return f'<span class="mini-flag-pick blank {escape(extra_class)}" style="{escape(style)}"></span>'
-    eliminated = ' eliminated' if _team_is_eliminated(team, matches_by_id) else ''
+    eliminated = ' eliminated' if mark_eliminated and _team_is_eliminated(team, matches_by_id) else ''
     class_attr = f'mini-flag-pick {escape(extra_class)}{eliminated}'
     return f'<span class="{class_attr}" style="{escape(style)}" title="{escape(team)}">{_flag_img(team, "Pick")}</span>'
 
