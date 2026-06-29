@@ -3960,9 +3960,339 @@
     "prediction": "A_WIN"
   },
   {
+    "user_id": "callahan",
+    "match_id": "K073",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K077",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K073",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K078",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K079",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K088",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K085",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K089",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K102",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K104",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "jake",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K077",
+    "prediction": "A_WIN"
+  },
+  {
     "user_id": "steven",
     "match_id": "K073",
     "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K078",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K079",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K088",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K087",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K089",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K094",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K102",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "steven",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K077",
+    "prediction": "A_WIN"
   },
   {
     "user_id": "ryan",
@@ -3970,9 +4300,159 @@
     "prediction": "B_WIN"
   },
   {
-    "user_id": "angela",
-    "match_id": "K073",
+    "user_id": "ryan",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K078",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K088",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K089",
     "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K093",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K091",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K101",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K102",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "ryan",
+    "match_id": "K103",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K077",
+    "prediction": "A_WIN"
   },
   {
     "user_id": "scott",
@@ -3980,13 +4460,478 @@
     "prediction": "B_WIN"
   },
   {
+    "user_id": "scott",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K078",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K088",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K087",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K089",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K094",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K099",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K102",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K104",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "scott",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K077",
+    "prediction": "A_WIN"
+  },
+  {
     "user_id": "deacon",
     "match_id": "K073",
     "prediction": "B_WIN"
   },
   {
+    "user_id": "deacon",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K078",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K079",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K088",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K089",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K102",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "deacon",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K077",
+    "prediction": "A_WIN"
+  },
+  {
     "user_id": "rick",
     "match_id": "K073",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K076",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K078",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K088",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K089",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K093",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K097",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K099",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K102",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "rick",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K077",
     "prediction": "A_WIN"
   },
   {
@@ -3995,18 +4940,158 @@
     "prediction": "B_WIN"
   },
   {
-    "user_id": "jake",
-    "match_id": "K073",
+    "user_id": "bennett",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K083",
     "prediction": "A_WIN"
   },
   {
-    "user_id": "callahan",
-    "match_id": "K073",
+    "user_id": "bennett",
+    "match_id": "K084",
     "prediction": "A_WIN"
   },
   {
-    "user_id": "maggie",
-    "match_id": "K073",
+    "user_id": "bennett",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K082",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K078",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K088",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K085",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K089",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K090",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K092",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K102",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "bennett",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K077",
     "prediction": "A_WIN"
   },
   {
@@ -4021,7 +5106,462 @@
   },
   {
     "user_id": "renee",
+    "match_id": "K083",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K084",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K078",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K086",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K088",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K085",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K087",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K089",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
     "match_id": "K090",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K092",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K095",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K098",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K100",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K101",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K102",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K077",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K073",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K075",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K082",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K076",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K078",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K088",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K089",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K090",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K093",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K091",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K092",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K095",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K096",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K099",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K100",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K101",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K102",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "angela",
+    "match_id": "K103",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K074",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K077",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K073",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K083",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K084",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K081",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K082",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K076",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K078",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K079",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K080",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K086",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K088",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K085",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K087",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K089",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K090",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K093",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K094",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K091",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K092",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K095",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K096",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K097",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K098",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K099",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K100",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K101",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K102",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K104",
+    "prediction": "A_WIN"
+  },
+  {
+    "user_id": "maggie",
+    "match_id": "K103",
     "prediction": "A_WIN"
   }
 ]
