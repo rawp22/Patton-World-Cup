@@ -4013,5 +4013,15 @@
     "user_id": "renee",
     "match_id": "K073",
     "prediction": "A_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K075",
+    "prediction": "B_WIN"
+  },
+  {
+    "user_id": "renee",
+    "match_id": "K090",
+    "prediction": "A_WIN"
   }
 ]
