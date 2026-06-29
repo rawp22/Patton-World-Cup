@@ -133,6 +133,23 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .pick-matchup { min-width:0; }
 .pick-points { align-self:stretch; display:flex; align-items:center; justify-content:flex-end; color:var(--gold-dark); font-weight:950; text-align:right; }
 .pick { color:var(--gold-dark); font-weight:900; text-align:right; }
+
+.user-knockout-brackets { display:grid; gap:12px; margin-top:24px; }
+.user-ko-bracket { overflow:hidden; }
+.user-ko-bracket summary { display:flex; align-items:center; gap:10px; padding:12px 14px; cursor:pointer; font-weight:900; color:var(--gold-dark); }
+.user-ko-board { margin:0 12px 12px; background:#101858; border-radius:8px; color:#ffd04a; padding:10px; aspect-ratio:16/9; min-height:300px; display:grid; grid-template-columns:repeat(9, minmax(0,1fr)); grid-template-rows:repeat(8, minmax(0,1fr)); gap:4px 8px; position:relative; overflow:hidden; }
+.user-ko-title { position:absolute; top:8px; left:0; right:0; text-align:center; font-weight:950; text-transform:uppercase; letter-spacing:1px; color:#ffd04a; font-size:clamp(13px,2.2vw,22px); pointer-events:none; }
+.mini-flag-pick { justify-self:center; align-self:center; width:34px; height:25px; display:flex; align-items:center; justify-content:center; position:relative; border-radius:4px; }
+.mini-flag-pick .flag-icon { width:34px; height:25px; border-color:#33427f; box-shadow:0 0 0 1px rgb(255 255 255 / 20%); }
+.mini-flag-pick.blank { border:1px dashed rgb(255 255 255 / 22%); }
+.mini-flag-pick.eliminated::after { content:"X"; position:absolute; inset:-5px; display:flex; align-items:center; justify-content:center; color:#050505; font-weight:1000; font-size:32px; line-height:1; text-shadow:0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff; transform:rotate(-8deg); }
+.user-ko-center { grid-column:5; grid-row:3 / span 4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:#ffd04a; font-weight:950; text-align:center; }
+.user-ko-cup { font-size:42px; line-height:1; }
+.user-ko-champion { transform:scale(1.35); margin:4px 0; }
+.user-ko-third { position:absolute; left:42%; right:42%; bottom:9px; display:flex; gap:8px; align-items:center; justify-content:center; }
+.user-ko-pending { padding:0 14px 14px; color:var(--muted); }
+@media (orientation:landscape) and (max-width:950px) { .user-ko-board { min-height:250px; padding:6px; gap:2px 5px; } .mini-flag-pick, .mini-flag-pick .flag-icon { width:27px; height:20px; } .mini-flag-pick.eliminated::after { font-size:25px; inset:-4px; } .user-ko-cup { font-size:30px; } .user-ko-title { top:5px; font-size:14px; } }
+
 @media (max-width:720px) { .topbar { align-items:start; flex-direction:column; } .hash { text-align:left; } .match-card summary { grid-template-columns:1fr; } .result { justify-self:start; } .impact-grid { grid-template-columns:1fr; } .impact-cell { border-left:0; } .pick-row { grid-template-columns:minmax(0,1fr) 42px; } .pick { text-align:left; } }
 """
 
@@ -145,7 +162,7 @@ const FEEDERS = {
   K101:['K097','K098'], K102:['K099','K100'], K104:['K101','K102'], K103:['K101','K102']
 };
 function showTab(tabId) {
-  const targetId = tabId || 'matches-tab';
+  const targetId = tabId || 'knockout-tab';
   const radioMap = {'matches-tab':'tab-matches','standings-tab':'tab-standings','knockout-tab':'tab-knockout'};
   const radio = document.getElementById(radioMap[targetId]);
   if (radio) radio.checked = true;
@@ -479,20 +496,51 @@ function winnerFor(match) {
 function teamInMatch(match, team) {
   return match.team_a === team || match.team_b === team;
 }
+function matchById() {
+  return new Map((window.CLIENT_DATA?.matches || []).map(match => [match.match_id, match]));
+}
+function slotTeamSet(slot, byId=matchById()) {
+  if (!slot) return new Set();
+  const matchRef = /^([WL])(\d+)$/.exec(slot);
+  if (!matchRef) return new Set([slot]);
+  const source = byId.get(`K${matchRef[2].padStart(3, '0')}`);
+  if (!source) return new Set([slot]);
+  if (matchRef[1] === 'W') {
+    if (source.result === 'A_WIN') return slotTeamSet(source.team_a, byId);
+    if (source.result === 'B_WIN') return slotTeamSet(source.team_b, byId);
+  } else {
+    if (source.result === 'A_WIN') return slotTeamSet(source.team_b, byId);
+    if (source.result === 'B_WIN') return slotTeamSet(source.team_a, byId);
+  }
+  return new Set([...slotTeamSet(source.team_a, byId), ...slotTeamSet(source.team_b, byId)]);
+}
+function winnerTeamSet(match) {
+  if (match.result === 'A_WIN') return slotTeamSet(match.team_a);
+  if (match.result === 'B_WIN') return slotTeamSet(match.team_b);
+  return null;
+}
+function pickedTeamCanScore(match, predictedTeam) {
+  if (!predictedTeam || !KNOCKOUT_POINTS[match.stage]) return true;
+  const winners = winnerTeamSet(match);
+  return !winners || winners.has(predictedTeam);
+}
 function predictionMap() {
   const map = new Map();
-  (window.CLIENT_DATA?.predictions || []).forEach(pred => map.set(`${pred.user_id}:${pred.match_id}`, pred.prediction));
+  (window.CLIENT_DATA?.predictions || []).forEach(pred => map.set(`${pred.user_id}:${pred.match_id}`, pred));
   return map;
 }
 function scoreForUser(match, user, predicted) {
   const points = {group_points:0, knockout_points:0, dark_horse_points:0, champion_points:0, total_points:0};
+  const predictedResult = typeof predicted === 'string' ? predicted : predicted?.prediction;
+  const predictedTeam = typeof predicted === 'string' ? null : predicted?.predicted_team;
   if (!match.result) return points;
   if (match.stage === 'group') {
-    if (predicted === match.result) points.group_points += 1;
-  } else if (KNOCKOUT_POINTS[match.stage] && predicted === match.result) {
+    if (predictedResult === match.result) points.group_points += 1;
+  } else if (KNOCKOUT_POINTS[match.stage] && predictedResult === match.result && pickedTeamCanScore(match, predictedTeam)) {
     points.knockout_points += KNOCKOUT_POINTS[match.stage];
   }
-  const winner = winnerFor(match);
+  const resolvedWinners = winnerTeamSet(match);
+  const winner = resolvedWinners && resolvedWinners.size === 1 ? [...resolvedWinners][0] : winnerFor(match);
   if (user.dark_horse && teamInMatch(match, user.dark_horse)) {
     if (match.stage === 'group') {
       if (winner === user.dark_horse) points.dark_horse_points += 3;
@@ -501,7 +549,7 @@ function scoreForUser(match, user, predicted) {
       points.dark_horse_points += 5;
     }
   }
-  if (user.champion && KNOCKOUT_POINTS[match.stage] && winner === user.champion && predicted === match.result) {
+  if (user.champion && KNOCKOUT_POINTS[match.stage] && winner === user.champion && predictedResult === match.result && pickedTeamCanScore(match, predictedTeam)) {
     points.champion_points += 2;
   }
   points.total_points = points.group_points + points.knockout_points + points.dark_horse_points + points.champion_points;
@@ -537,7 +585,8 @@ function recalcClientLeaderboard(matchFilter=null) {
       row.knockout_points += pts.knockout_points;
       row.dark_horse_points += pts.dark_horse_points;
       row.champion_points += pts.champion_points;
-      if (match.stage === 'group' && match.result === 'DRAW' && predicted === 'DRAW') row.draws += 1;
+      const predictedResult = typeof predicted === 'string' ? predicted : predicted?.prediction;
+      if (match.stage === 'group' && match.result === 'DRAW' && predictedResult === 'DRAW') row.draws += 1;
     });
   });
   rows.sort((a,b) => b.total_points - a.total_points || a.order - b.order);
@@ -614,18 +663,18 @@ function shouldClientFetchMatch(match, now) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const initial = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
-  showTab(document.getElementById(initial) ? initial : 'matches-tab');
+  const initial = window.location.hash ? window.location.hash.slice(1) : 'knockout-tab';
+  showTab(document.getElementById(initial) ? initial : 'knockout-tab');
   applyMatchSpoilers();
   applyLeaderboardSpoilerMode();
   fetchClientResults();
   window.setInterval(fetchClientResults, 5 * 60 * 1000);
 });
 window.addEventListener('hashchange', () => {
-  const target = window.location.hash ? window.location.hash.slice(1) : 'matches-tab';
+  const target = window.location.hash ? window.location.hash.slice(1) : 'knockout-tab';
   if (document.getElementById(target)) showTab(target);
 });
-showTab(window.location.hash ? window.location.hash.slice(1) : 'matches-tab');
+showTab(window.location.hash ? window.location.hash.slice(1) : 'knockout-tab');
 """
 
 
@@ -635,6 +684,7 @@ def render_standalone_dashboard() -> str:
     users_by_id = {user["user_id"]: user for user in data["users"]}
     correct_draws = _correct_draw_counts(data["matches"], data["predictions"])
     predictions_by_user_match = {(row["user_id"], row["match_id"]): row["prediction"] for row in data["predictions"]}
+    prediction_rows_by_user_match = {(row["user_id"], row["match_id"]): row for row in data["predictions"]}
     leaderboard_order = [row["user_id"] for row in result["leaderboard"]]
     matches_by_date = defaultdict(list)
     knockout_by_round = defaultdict(list)
@@ -655,6 +705,7 @@ def render_standalone_dashboard() -> str:
     bracket_points = {(row["user_id"], row["match_id"]): row["total_points"] for row in result["breakdowns"]}
     user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points)
     knockout_sections = _knockout_bracket(knockout_by_round, result["match_impacts"], leaderboard_order, groups, data["matches"])
+    user_knockout_sections = _user_knockout_brackets(leaderboard_order, users_by_id, data["matches"], prediction_rows_by_user_match)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -673,13 +724,13 @@ def render_standalone_dashboard() -> str:
     <div class="hash">Input hash<br><code>{escape(result["input_hash"][:16])}</code></div>
   </header>
   <main>
-    <input class="tab-radio" type="radio" name="dashboard-tab" id="tab-matches" checked>
+    <input class="tab-radio" type="radio" name="dashboard-tab" id="tab-matches">
     <input class="tab-radio" type="radio" name="dashboard-tab" id="tab-standings">
-    <input class="tab-radio" type="radio" name="dashboard-tab" id="tab-knockout">
+    <input class="tab-radio" type="radio" name="dashboard-tab" id="tab-knockout" checked>
     <nav class="tabs" aria-label="Dashboard views">
       <label class="tab-button" data-tab="standings-tab" for="tab-standings" role="button" aria-selected="false">Group Standings/Brackets</label>
-      <label class="tab-button" data-tab="matches-tab" for="tab-matches" role="button" aria-selected="true">Group Matches</label>
-      <label class="tab-button" data-tab="knockout-tab" for="tab-knockout" role="button" aria-selected="false">Knockout</label>
+      <label class="tab-button" data-tab="matches-tab" for="tab-matches" role="button" aria-selected="false">Group Matches</label>
+      <label class="tab-button" data-tab="knockout-tab" for="tab-knockout" role="button" aria-selected="true">Knockout</label>
     </nav>
     <section class="panel leaderboard-panel">
       <div class="section-heading"><h2>Leaderboard</h2><span>{len(result["leaderboard"])} participants</span></div>
@@ -717,6 +768,7 @@ def render_standalone_dashboard() -> str:
       <p class="bracket-note">Round of 32 slots use FIFA's published position labels. Placeholder teams such as 1A, 2B, or 3C/E/F/H/I will resolve once group standings and best third-place qualifiers are known.</p>
       <div class="toolbar"><button type="button" data-expand-target="#knockout-tab .match-card">Expand all</button><button type="button" data-collapse-target="#knockout-tab .match-card">Collapse all</button></div>
       <div class="knockout">{knockout_sections}</div>
+      <section class="user-knockout-brackets"><div class="section-heading"><h2>User Knockout Brackets</h2><span>Participant picks in leaderboard order</span></div>{user_knockout_sections}</section>
     </section>
   </main>
   <script>window.LEADERBOARD_SNAPSHOTS = {json.dumps(leaderboard_snapshots)}; window.CLIENT_DATA = {json.dumps(client_data)};</script>
@@ -1086,6 +1138,105 @@ def _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, 
 </details>''')
     return "".join(sections)
 
+
+
+def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_rows_by_user_match):
+    r32_left = ["K074", "K077", "K073", "K075", "K083", "K084", "K081", "K082"]
+    r16_left = ["K089", "K090", "K093", "K094"]
+    qf_left = ["K097", "K098"]
+    sf_left = ["K101"]
+    r32_right = ["K076", "K078", "K079", "K080", "K086", "K088", "K085", "K087"]
+    r16_right = ["K091", "K092", "K095", "K096"]
+    qf_right = ["K099", "K100"]
+    sf_right = ["K102"]
+    layout = []
+    layout += [(match_id, 1, row) for row, match_id in enumerate(r32_left, 1)]
+    layout += [(match_id, 2, row) for row, match_id in zip([1, 3, 5, 7], r16_left)]
+    layout += [(match_id, 3, row) for row, match_id in zip([2, 6], qf_left)]
+    layout += [(match_id, 4, 4) for match_id in sf_left]
+    layout += [(match_id, 6, 4) for match_id in sf_right]
+    layout += [(match_id, 7, row) for row, match_id in zip([2, 6], qf_right)]
+    layout += [(match_id, 8, row) for row, match_id in zip([1, 3, 5, 7], r16_right)]
+    layout += [(match_id, 9, row) for row, match_id in enumerate(r32_right, 1)]
+    matches_by_id = {match["match_id"]: match for match in matches}
+    sections = []
+    for user_id in leaderboard_order:
+        user = users_by_id[user_id]
+        has_knockout = any((user_id, match_id) in prediction_rows_by_user_match for match_id, _, _ in layout)
+        if not has_knockout:
+            body = '<p class="user-ko-pending">Knockout picks pending.</p>'
+        else:
+            flags = []
+            for match_id, col, row in layout:
+                prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
+                team = prediction.get("predicted_team")
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row};"))
+            champion = prediction_rows_by_user_match.get((user_id, "K104"), {}).get("predicted_team")
+            third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("predicted_team")
+            other_third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("third_place_other")
+            center = (
+                f'<div class="user-ko-title">{escape(user["display_name"])}\'s Bracket</div>'
+                f'<div class="user-ko-center"><div class="user-ko-cup">&#127942;</div><div class="user-ko-champion">{_mini_ko_flag(champion, matches_by_id, extra_class="champion")}</div><div>Champion</div></div>'
+                f'<div class="user-ko-third">{_mini_ko_flag(third, matches_by_id)}{_mini_ko_flag(other_third, matches_by_id)}</div>'
+            )
+            body = f'<div class="user-ko-board">{"".join(flags)}{center}</div>'
+        sections.append(f'''<details class="panel user-ko-bracket">
+  <summary>{_flag_pair(user.get("champion"), user.get("dark_horse"))}<span>{escape(user["display_name"])}</span></summary>
+  {body}
+</details>''')
+    return ''.join(sections)
+
+
+def _mini_ko_flag(team, matches_by_id, style='', extra_class=''):
+    if not team:
+        return f'<span class="mini-flag-pick blank {escape(extra_class)}" style="{escape(style)}"></span>'
+    eliminated = ' eliminated' if _team_is_eliminated(team, matches_by_id) else ''
+    class_attr = f'mini-flag-pick {escape(extra_class)}{eliminated}'
+    return f'<span class="{class_attr}" style="{escape(style)}" title="{escape(team)}">{_flag_img(team, "Pick")}</span>'
+
+
+def _team_is_eliminated(team, matches_by_id):
+    for match in matches_by_id.values():
+        if match.get("stage") not in KNOCKOUT_STAGES_FOR_RENDER or not match.get("result"):
+            continue
+        teams = _render_match_team_sets(match, matches_by_id)
+        if team not in teams["all"]:
+            continue
+        winner = teams["a"] if match.get("result") == "A_WIN" else teams["b"]
+        if team not in winner:
+            return True
+    return False
+
+
+KNOCKOUT_STAGES_FOR_RENDER = {"R32", "R16", "QF", "SF", "F", "3RD"}
+
+
+def _render_match_team_sets(match, matches_by_id):
+    a = _render_slot_team_set(match.get("team_a"), matches_by_id)
+    b = _render_slot_team_set(match.get("team_b"), matches_by_id)
+    return {"a": a, "b": b, "all": a | b}
+
+
+def _render_slot_team_set(slot, matches_by_id):
+    if not slot:
+        return set()
+    if len(slot) >= 2 and slot[0] in {"W", "L"} and slot[1:].isdigit():
+        source = matches_by_id.get(f"K{int(slot[1:]):03d}")
+        if not source:
+            return {slot}
+        result = source.get("result")
+        if slot[0] == "W":
+            if result == "A_WIN":
+                return _render_slot_team_set(source.get("team_a"), matches_by_id)
+            if result == "B_WIN":
+                return _render_slot_team_set(source.get("team_b"), matches_by_id)
+        if slot[0] == "L":
+            if result == "A_WIN":
+                return _render_slot_team_set(source.get("team_b"), matches_by_id)
+            if result == "B_WIN":
+                return _render_slot_team_set(source.get("team_a"), matches_by_id)
+        return _render_slot_team_set(source.get("team_a"), matches_by_id) | _render_slot_team_set(source.get("team_b"), matches_by_id)
+    return {slot}
 
 def _user_pick_row(user_id, match, prediction, points):
     team_a = escape(match["team_a"])

@@ -50,8 +50,9 @@ def calculate_scores(
     """
     score_config = ScoreConfig.from_dict(config)
     predictions_by_user_match = {
-        (row["user_id"], row["match_id"]): row["prediction"] for row in predictions
+        (row["user_id"], row["match_id"]): row for row in predictions
     }
+    matches_by_id = {match["match_id"]: match for match in matches}
     third_place_by_user = {
         row["user_id"]: row for row in (third_place_predictions or [])
     }
@@ -82,11 +83,13 @@ def calculate_scores(
     for match in sorted(completed_matches, key=lambda item: (item["date"], item["match_id"])):
         for user in users:
             user_id = user["user_id"]
-            predicted = predictions_by_user_match.get((user_id, match["match_id"]))
+            prediction_row = predictions_by_user_match.get((user_id, match["match_id"]))
             row = score_match_for_user(
                 match=match,
                 user=user,
-                predicted_result=predicted,
+                predicted_result=prediction_row.get("prediction") if prediction_row else None,
+                predicted_team=prediction_row.get("predicted_team") if prediction_row else None,
+                winner_team_set=_winner_team_set_for_match(match, matches_by_id),
                 tournament_winner=tournament_winner,
                 champion_win_counts=champion_win_counts,
                 third_place_prediction=third_place_by_user.get(user_id),
@@ -129,6 +132,8 @@ def score_match_for_user(
     champion_win_counts: dict[str, int],
     third_place_prediction: dict[str, Any] | None,
     third_place_eligible: bool,
+    predicted_team: str | None = None,
+    winner_team_set: set[str] | None = None,
 ) -> dict[str, Any]:
     result = match.get("result")
     points = {
@@ -173,6 +178,7 @@ def score_match_for_user(
         and match["stage"] in KNOCKOUT_STAGES
         and winner == champion
         and predicted_result == result
+        and _predicted_team_matches_winner(predicted_team, winner_team_set)
     ):
         points["champion_points"] += 2
         explanations.append("Champion picked knockout win bonus (+2)")
@@ -236,8 +242,9 @@ def calculate_scores_core(
 ) -> dict[str, Any]:
     score_config = ScoreConfig.from_dict(config)
     predictions_by_user_match = {
-        (row["user_id"], row["match_id"]): row["prediction"] for row in predictions
+        (row["user_id"], row["match_id"]): row for row in predictions
     }
+    matches_by_id = {match["match_id"]: match for match in matches}
     third_place_by_user = {
         row["user_id"]: row for row in (third_place_predictions or [])
     }
@@ -265,14 +272,17 @@ def calculate_scores_core(
     for match in sorted(completed_matches, key=lambda item: (item["date"], item["match_id"])):
         for user in users:
             user_id = user["user_id"]
+            prediction_row = predictions_by_user_match.get((user_id, match["match_id"]))
             row = score_match_for_user(
                 match,
                 user,
-                predictions_by_user_match.get((user_id, match["match_id"])),
+                prediction_row.get("prediction") if prediction_row else None,
                 tournament_winner,
                 champion_win_counts,
                 third_place_by_user.get(user_id),
                 user_id in eligible_third_place_users,
+                predicted_team=prediction_row.get("predicted_team") if prediction_row else None,
+                winner_team_set=_winner_team_set_for_match(match, matches_by_id),
             )
             breakdowns.append(row)
             _add_points(totals[user_id], row)
@@ -281,6 +291,51 @@ def calculate_scores_core(
     _assign_ranks(leaderboard)
     return {"leaderboard": leaderboard, "totals": totals, "breakdowns": breakdowns}
 
+
+
+def _predicted_team_matches_winner(predicted_team: str | None, winner_team_set: set[str] | None) -> bool:
+    if not predicted_team:
+        return True
+    if not winner_team_set:
+        return True
+    return predicted_team in winner_team_set
+
+
+def _resolved_winner_for_match(match: dict[str, Any], winner_team_set: set[str] | None = None) -> str | None:
+    if winner_team_set and len(winner_team_set) == 1:
+        return next(iter(winner_team_set))
+    return _winner_for_match(match)
+
+
+def _winner_team_set_for_match(match: dict[str, Any], matches_by_id: dict[str, dict[str, Any]]) -> set[str] | None:
+    result = match.get("result")
+    if result == "A_WIN":
+        return _slot_team_set(match.get("team_a"), matches_by_id, "winner")
+    if result == "B_WIN":
+        return _slot_team_set(match.get("team_b"), matches_by_id, "winner")
+    return None
+
+
+def _slot_team_set(slot: str | None, matches_by_id: dict[str, dict[str, Any]], mode: str = "winner") -> set[str]:
+    if not slot:
+        return set()
+    if len(slot) >= 2 and slot[0] in {"W", "L"} and slot[1:].isdigit():
+        source = matches_by_id.get(f"K{int(slot[1:]):03d}")
+        if not source:
+            return {slot}
+        result = source.get("result")
+        if slot[0] == "W":
+            if result == "A_WIN":
+                return _slot_team_set(source.get("team_a"), matches_by_id, "winner")
+            if result == "B_WIN":
+                return _slot_team_set(source.get("team_b"), matches_by_id, "winner")
+        if slot[0] == "L":
+            if result == "A_WIN":
+                return _slot_team_set(source.get("team_b"), matches_by_id, "winner")
+            if result == "B_WIN":
+                return _slot_team_set(source.get("team_a"), matches_by_id, "winner")
+        return _slot_team_set(source.get("team_a"), matches_by_id, "winner") | _slot_team_set(source.get("team_b"), matches_by_id, "winner")
+    return {slot}
 
 def _breakdown_row(
     match: dict[str, Any],
