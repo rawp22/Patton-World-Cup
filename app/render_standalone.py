@@ -350,8 +350,8 @@ function renderLeaderboardRows(rows) {
   <td class="spacer-cell"></td>
   <td>${row.group_points}</td>
   <td>${row.knockout_points}</td>
-  <td>${row.dark_horse_points}</td>
   <td>${row.champion_points}</td>
+  <td>${row.dark_horse_points}</td>
   <td>${row.draws}</td>
   <td class="spacer-cell"></td>
 </tr>`).join('');
@@ -763,7 +763,7 @@ def render_standalone_dashboard() -> str:
       <div class="table-wrap">
         <table class="leaderboard-table">
           <colgroup><col class="rank-col"><col class="user-col"><col class="score-col"><col class="stat-gap-col"><col class="score-col"><col class="ko-col"><col class="score-col"><col class="score-col"><col class="draws-col"><col class="trail-col"></colgroup>
-          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th class="spacer-cell"></th><th>Group</th><th>Knockout</th><th>DHB</th><th>CB</th><th>#&nbsp;Draws</th><th class="spacer-cell"></th></tr></thead>
+          <thead><tr><th>Rank</th><th>User</th><th>Total</th><th class="spacer-cell"></th><th>Group</th><th>Knockout</th><th>CB</th><th>DHB</th><th>#&nbsp;Draws</th><th class="spacer-cell"></th></tr></thead>
           <tbody>{leaderboard_rows}</tbody>
         </table>
       </div>
@@ -773,8 +773,8 @@ def render_standalone_dashboard() -> str:
         <ul>
           <li><strong>Group</strong> = points from group stage</li>
           <li><strong>Knockout</strong> = points from knockout stage</li>
-          <li><strong>Dark Horse Bonus</strong> = points from dark horse group stage wins/draws and knockout stage wins</li>
           <li><strong>Champion Bonus</strong> = points from champion winning knockout stage games</li>
+          <li><strong>Dark Horse Bonus</strong> = points from dark horse group stage wins/draws and knockout stage wins</li>
           <li><strong># Draws</strong> = number of correctly predicted draws during group stage</li>
         </ul>
       </details>
@@ -901,8 +901,8 @@ def _leaderboard_json_row_html(row):
   <td class="spacer-cell"></td>
   <td>{row["group_points"]}</td>
   <td>{row["knockout_points"]}</td>
-  <td>{row["dark_horse_points"]}</td>
   <td>{row["champion_points"]}</td>
+  <td>{row["dark_horse_points"]}</td>
   <td>{row["draws"]}</td>
   <td class="spacer-cell"></td>
 </tr>"""
@@ -916,8 +916,8 @@ def _leaderboard_row(row, user, draws):
   <td class="total">{row["total_points"]}</td>
   <td>{row["group_points"]}</td>
   <td>{row["knockout_points"]}</td>
-  <td>{row["dark_horse_points"]}</td>
   <td>{row["champion_points"]}</td>
+  <td>{row["dark_horse_points"]}</td>
   <td>{draws}</td>
 </tr>"""
 
