@@ -120,6 +120,13 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .bracket-half .result, .bracket-center .result { font-size:11px; }
 .bracket-half .impact-grid, .bracket-center .impact-grid { min-width:520px; } .bracket-board .match-card[open] .venue { font-size:14px; }
 .bracket-card-highlight { outline:3px solid var(--gold); box-shadow:0 0 0 4px rgb(214 167 53 / 22%); }
+.today-match { outline:3px solid #1e6bd6; box-shadow:0 0 0 4px rgb(30 107 214 / 18%), 0 12px 28px rgb(83 61 24 / 16%); }
+.knockout-schedule { display:grid; gap:8px; margin:0 0 16px; padding:18px; }
+.knockout-date { background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.knockout-date summary { cursor:pointer; padding:11px 14px; color:var(--gold-dark); font-weight:950; }
+.knockout-date-list { display:grid; gap:6px; padding:0 14px 12px; color:var(--ink); }
+.knockout-date-row { display:flex; justify-content:space-between; gap:12px; padding-top:6px; border-top:1px solid var(--line); }
+.knockout-date-time { color:var(--muted); white-space:nowrap; font-weight:800; }
 .user-brackets { display:grid; gap:12px; margin-top:24px; }
 .user-bracket { overflow:hidden; }
 .user-bracket summary { display:flex; align-items:center; gap:10px; padding:14px 16px; cursor:pointer; font-weight:900; color:var(--gold-dark); }
@@ -718,6 +725,7 @@ def render_standalone_dashboard() -> str:
     bracket_points = {(row["user_id"], row["match_id"]): row["total_points"] for row in result["breakdowns"]}
     user_bracket_sections = _user_group_brackets(leaderboard_order, users_by_id, group_matches, groups, predictions_by_user_match, bracket_points)
     knockout_sections = _knockout_bracket(knockout_by_round, result["match_impacts"], leaderboard_order, groups, data["matches"])
+    knockout_schedule_sections = _knockout_date_schedule(data["matches"], groups)
     user_knockout_sections = _user_knockout_brackets(leaderboard_order, users_by_id, data["matches"], prediction_rows_by_user_match)
 
     return f"""<!doctype html>
@@ -779,6 +787,7 @@ def render_standalone_dashboard() -> str:
     <section id="knockout-tab" class="tab-panel">
       <div class="section-heading"><h2>Knockout</h2><span>Projected slots update after group-stage qualification is known</span></div>
       <p class="bracket-note">Round of 32 slots use FIFA's published position labels. Placeholder teams such as 1A, 2B, or 3C/E/F/H/I will resolve once group standings and best third-place qualifiers are known.</p>
+      {knockout_schedule_sections}
       <div class="toolbar"><button type="button" data-expand-target="#knockout-tab .match-card">Expand all</button><button type="button" data-collapse-target="#knockout-tab .match-card">Collapse all</button></div>
       <div class="knockout">{knockout_sections}</div>
       <section class="user-knockout-brackets"><div class="section-heading"><h2>User Knockout Brackets</h2><span>Participant picks in leaderboard order</span></div>{user_knockout_sections}</section>
@@ -946,14 +955,63 @@ def _date_section(date, matches, impacts, leaderboard_order, report_match_ids, g
     return f"""<section class="date-group"><h3>{escape(_display_date(date))}</h3><div class="match-grid">{cards}</div></section>"""
 
 
+def _knockout_date_schedule(matches, groups):
+    slot_map = _clinched_group_slots(groups or {}, matches)
+    by_date = defaultdict(list)
+    for match in matches:
+        if match.get("stage") == "group":
+            continue
+        by_date[match["date"]].append(_resolve_knockout_match(match, slot_map))
+    visible_dates = [
+        date for date, day_matches in by_date.items()
+        if any(not match.get("result") for match in day_matches)
+    ]
+    if not visible_dates:
+        return ""
+    sections = []
+    for index, date in enumerate(sorted(visible_dates)):
+        rows = []
+        for match in sorted(by_date[date], key=lambda item: (_time_sort_key(item), item["match_id"])):
+            time_label = _display_kickoff_est(match.get("kickoff_et"))
+            rows.append(
+                f'<div class="knockout-date-row"><span>{escape(match["team_a"])} vs {escape(match["team_b"])}</span><span class="knockout-date-time">{escape(time_label)}</span></div>'
+            )
+        open_attr = " open" if index == 0 else ""
+        sections.append(
+            f'<details class="knockout-date"{open_attr}><summary>{escape(_display_date(date))}</summary><div class="knockout-date-list">{"".join(rows)}</div></details>'
+        )
+    return f'''<section class="knockout-schedule panel">
+  <div class="section-heading"><h2>Knockout Match Days</h2><span>Upcoming dates disappear after the final game that day is complete</span></div>
+  {''.join(sections)}
+</section>'''
+
+
+def _display_kickoff_est(kickoff):
+    if not kickoff:
+        return "Time TBD"
+    raw = kickoff.replace(" ET", "").strip()
+    try:
+        hour_text, minute_text = raw.split(":", 1)
+        hour = int(hour_text)
+        suffix = "am" if hour < 12 else "pm"
+        display_hour = hour % 12 or 12
+        return f"{display_hour}:{minute_text}{suffix} EST"
+    except ValueError:
+        return kickoff.replace(" ET", " EST")
+
+
+def _resolve_knockout_match(match, slot_map):
+    rendered = dict(match)
+    for key in ("team_a", "team_b"):
+        rendered[key] = slot_map.get(rendered.get(key), rendered.get(key))
+    return rendered
+
+
 def _knockout_bracket(knockout_by_round, impacts, leaderboard_order, groups=None, all_matches=None):
     slot_map = _clinched_group_slots(groups or {}, all_matches or [])
 
     def resolve_match(match):
-        rendered = dict(match)
-        for key in ("team_a", "team_b"):
-            rendered[key] = slot_map.get(rendered.get(key), rendered.get(key))
-        return rendered
+        return _resolve_knockout_match(match, slot_map)
 
     def by_ids(round_label, ids):
         matches = {match["match_id"]: resolve_match(match) for match in knockout_by_round.get(round_label, [])}
@@ -1034,7 +1092,12 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False, grou
     venue = f'<p class="venue">{escape(" · ".join(part for part in meta_parts if part))}</p>'
     result_attr = escape(match.get("result") or "")
     reveal_attr = escape(reveal_at)
-    card_class = "match-card spoiler-hidden" if match.get("result") else "match-card"
+    classes = ["match-card"]
+    if match.get("result"):
+        classes.append("spoiler-hidden")
+    if match.get("stage") != "group" and match.get("date") == datetime.now(EASTERN).date().isoformat():
+        classes.append("today-match")
+    card_class = " ".join(classes)
     teams_html = f'<span class="default-teams">{escape(default_teams)}</span><span class="live-teams">{escape(live_teams)}</span>'
     return f"""<details class="{card_class}" data-match-id="{escape(match["match_id"])}" data-result="{result_attr}" data-reveal-at="{reveal_attr}">
   <summary><span class="stage">{stage}</span><span class="teams">{teams_html}</span><span class="result">{result_html}</span></summary>
