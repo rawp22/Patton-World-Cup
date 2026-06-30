@@ -962,11 +962,12 @@ def _date_section(date, matches, impacts, leaderboard_order, report_match_ids, g
 
 def _knockout_date_schedule(matches, groups):
     slot_map = _clinched_group_slots(groups or {}, matches)
+    matches_by_id = {match["match_id"]: match for match in matches}
     by_date = defaultdict(list)
     for match in matches:
         if match.get("stage") == "group":
             continue
-        by_date[match["date"]].append(_resolve_knockout_match(match, slot_map))
+        by_date[match["date"]].append(_resolve_knockout_match(match, slot_map, matches_by_id))
     visible_dates = [
         date for date, day_matches in by_date.items()
         if any(not match.get("result") for match in day_matches)
@@ -1005,18 +1006,35 @@ def _display_kickoff_est(kickoff):
         return kickoff.replace(" ET", " EST")
 
 
-def _resolve_knockout_match(match, slot_map):
+def _resolve_knockout_match(match, slot_map, matches_by_id=None):
     rendered = dict(match)
     for key in ("team_a", "team_b"):
-        rendered[key] = slot_map.get(rendered.get(key), rendered.get(key))
+        rendered[key] = _resolve_knockout_display_slot(rendered.get(key), slot_map, matches_by_id or {})
     return rendered
+
+
+def _resolve_knockout_display_slot(slot, slot_map, matches_by_id):
+    if not slot:
+        return slot
+    if slot in slot_map:
+        return slot_map[slot]
+    if len(slot) >= 2 and slot[0] in {"W", "L"} and slot[1:].isdigit():
+        source = matches_by_id.get(f"K{int(slot[1:]):03d}")
+        if not source or not source.get("result"):
+            return slot
+        winner_key = "team_a" if source["result"] == "A_WIN" else "team_b"
+        loser_key = "team_b" if source["result"] == "A_WIN" else "team_a"
+        source_slot = source[winner_key] if slot[0] == "W" else source[loser_key]
+        return _resolve_knockout_display_slot(source_slot, slot_map, matches_by_id)
+    return slot
 
 
 def _knockout_bracket(knockout_by_round, impacts, leaderboard_order, groups=None, all_matches=None):
     slot_map = _clinched_group_slots(groups or {}, all_matches or [])
+    matches_by_id = {match["match_id"]: match for match in (all_matches or [])}
 
     def resolve_match(match):
-        return _resolve_knockout_match(match, slot_map)
+        return _resolve_knockout_match(match, slot_map, matches_by_id)
 
     def by_ids(round_label, ids):
         matches = {match["match_id"]: resolve_match(match) for match in knockout_by_round.get(round_label, [])}
