@@ -1016,9 +1016,9 @@
     "team_b": "Norway",
     "venue": "AT&T Stadium, Dallas",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 2,
     "kickoff_et": "13:00 ET"
   },
   {
