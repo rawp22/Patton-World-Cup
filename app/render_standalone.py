@@ -1278,8 +1278,9 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
                 match = matches_by_id.get(match_id, {})
+                earned_class = "" if match.get("stage") == "R32" else _earned_pick_class(match, prediction, team, matches_by_id)
                 flag_state = " ".join(filter(None, [
-                    _earned_pick_class(match, prediction, team, matches_by_id),
+                    earned_class,
                     _lost_pick_class(match, team, matches_by_id),
                 ]))
                 flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=flag_state))
