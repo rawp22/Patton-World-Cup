@@ -973,10 +973,11 @@
     "team_b": "Morocco",
     "venue": "Estadio BBVA, Monterrey",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
-    "kickoff_et": "21:00 ET"
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 1,
+    "kickoff_et": "21:00 ET",
+    "result_note": "Morocco wins on PKs"
   },
   {
     "match_id": "K076",

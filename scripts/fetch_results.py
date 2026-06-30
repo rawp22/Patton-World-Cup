@@ -65,7 +65,7 @@ def get_json(url: str, api_key: str = "") -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
-def espn_fixture_result_for_match(match: dict, events: list[dict]) -> tuple[str, int, int] | None:
+def espn_fixture_result_for_match(match: dict, events: list[dict]) -> dict | None:
     team_a_keys = team_keys(match["team_a"])
     team_b_keys = team_keys(match["team_b"])
     for event in events:
@@ -122,13 +122,18 @@ def espn_fixture_result_for_match(match: dict, events: list[dict]) -> tuple[str,
 
         if direct:
             result = {"HOME_WIN": "A_WIN", "AWAY_WIN": "B_WIN", "DRAW": "DRAW"}[result_home_away]
-            return result, home_goals, away_goals
-        result = {"HOME_WIN": "B_WIN", "AWAY_WIN": "A_WIN", "DRAW": "DRAW"}[result_home_away]
-        return result, away_goals, home_goals
+            payload = {"result": result, "goals_a": home_goals, "goals_b": away_goals}
+        else:
+            result = {"HOME_WIN": "B_WIN", "AWAY_WIN": "A_WIN", "DRAW": "DRAW"}[result_home_away]
+            payload = {"result": result, "goals_a": away_goals, "goals_b": home_goals}
+        if match.get("stage") in KNOCKOUT_STAGES and home_goals == away_goals and result != "DRAW":
+            winner = match["team_a"] if result == "A_WIN" else match["team_b"]
+            payload["result_note"] = f"{winner} wins on PKs"
+        return payload
     return None
 
 
-def fixture_result_for_match(match: dict, fixtures: list[dict]) -> tuple[str, int, int] | None:
+def fixture_result_for_match(match: dict, fixtures: list[dict]) -> dict | None:
     team_a_keys = team_keys(match["team_a"])
     team_b_keys = team_keys(match["team_b"])
     for fixture in fixtures:
@@ -154,10 +159,18 @@ def fixture_result_for_match(match: dict, fixtures: list[dict]) -> tuple[str, in
 
         home_winner = home.get("winner")
         away_winner = away.get("winner")
+        penalties = fixture.get("score", {}).get("penalty", {})
+        home_penalties = penalties.get("home")
+        away_penalties = penalties.get("away")
         if home_winner is True:
             result_home_away = "HOME_WIN"
         elif away_winner is True:
             result_home_away = "AWAY_WIN"
+        elif home_goals == away_goals and match.get("stage") in KNOCKOUT_STAGES:
+            if home_penalties is not None and away_penalties is not None and home_penalties != away_penalties:
+                result_home_away = "HOME_WIN" if home_penalties > away_penalties else "AWAY_WIN"
+            else:
+                return None
         elif home_goals == away_goals:
             result_home_away = "DRAW"
         elif home_goals > away_goals:
@@ -167,9 +180,14 @@ def fixture_result_for_match(match: dict, fixtures: list[dict]) -> tuple[str, in
 
         if direct:
             result = {"HOME_WIN": "A_WIN", "AWAY_WIN": "B_WIN", "DRAW": "DRAW"}[result_home_away]
-            return result, int(home_goals), int(away_goals)
-        result = {"HOME_WIN": "B_WIN", "AWAY_WIN": "A_WIN", "DRAW": "DRAW"}[result_home_away]
-        return result, int(away_goals), int(home_goals)
+            payload = {"result": result, "goals_a": int(home_goals), "goals_b": int(away_goals)}
+        else:
+            result = {"HOME_WIN": "B_WIN", "AWAY_WIN": "A_WIN", "DRAW": "DRAW"}[result_home_away]
+            payload = {"result": result, "goals_a": int(away_goals), "goals_b": int(home_goals)}
+        if match.get("stage") in KNOCKOUT_STAGES and home_goals == away_goals and result != "DRAW":
+            winner = match["team_a"] if result == "A_WIN" else match["team_b"]
+            payload["result_note"] = f"{winner} wins on PKs"
+        return payload
     return None
 
 
@@ -238,14 +256,17 @@ def update_results() -> int:
                 source = "API-Football"
             if not result:
                 continue
-            outcome, goals_a, goals_b = result
-            match["result"] = outcome
-            match["goals_a"] = goals_a
-            match["goals_b"] = goals_b
+            match["result"] = result["result"]
+            match["goals_a"] = result["goals_a"]
+            match["goals_b"] = result["goals_b"]
+            if result.get("result_note"):
+                match["result_note"] = result["result_note"]
+            else:
+                match.pop("result_note", None)
             updated += 1
             print(
                 f"Updated {match['match_id']} from {source}: "
-                f"{match['team_a']} {goals_a}-{goals_b} {match['team_b']} ({outcome})"
+                f"{match['team_a']} {match['goals_a']}-{match['goals_b']} {match['team_b']} ({match['result']})"
             )
 
     if updated:

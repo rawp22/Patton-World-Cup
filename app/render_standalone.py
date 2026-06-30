@@ -491,7 +491,12 @@ function resultFromEspnEvent(match, event) {
   const result = direct
     ? {HOME_WIN:'A_WIN', AWAY_WIN:'B_WIN', DRAW:'DRAW'}[homeAwayResult]
     : {HOME_WIN:'B_WIN', AWAY_WIN:'A_WIN', DRAW:'DRAW'}[homeAwayResult];
-  return direct ? {result, goals_a:homeGoals, goals_b:awayGoals} : {result, goals_a:awayGoals, goals_b:homeGoals};
+  const payload = direct ? {result, goals_a:homeGoals, goals_b:awayGoals} : {result, goals_a:awayGoals, goals_b:homeGoals};
+  if (KNOCKOUT_POINTS[match.stage] && homeGoals === awayGoals && result !== 'DRAW') {
+    const winner = result === 'A_WIN' ? match.team_a : match.team_b;
+    payload.result_note = `${winner} wins on PKs`;
+  }
+  return payload;
 }
 async function fetchEspnDate(date) {
   const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=${date.replaceAll('-', '')}`, {cache:'no-store'});
