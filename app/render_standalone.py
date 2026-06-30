@@ -154,7 +154,7 @@ body.knockout-modal-open #knockout-tab .match-card:not([open]):not(.bracket-card
 .mini-flag-pick.eliminated::before, .mini-flag-pick.eliminated::after { content:""; position:absolute; left:-5px; right:-5px; top:50%; height:5px; background:#050505; border-radius:999px; box-shadow:0 0 0 1px #fff, 0 1px 4px rgb(0 0 0 / 45%); pointer-events:none; z-index:3; }
 .mini-flag-pick.eliminated::before { transform:translateY(-50%) rotate(34deg); }
 .mini-flag-pick.eliminated::after { transform:translateY(-50%) rotate(-34deg); }
-.user-ko-center { grid-column:5; grid-row:3 / span 4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:#ffd04a; font-weight:950; text-align:center; }
+.user-ko-center { grid-column:5; grid-row:7 / span 4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:#ffd04a; font-weight:950; text-align:center; }
 .user-ko-cup { font-size:42px; line-height:1; }
 .user-ko-champion { transform:scale(1.35); margin:4px 0; }
 .user-ko-third { position:absolute; left:42%; right:42%; bottom:9px; display:flex; gap:8px; align-items:center; justify-content:center; }
