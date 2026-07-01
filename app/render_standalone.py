@@ -661,6 +661,48 @@ function updateClientPickPoints(match) {
     });
   });
 }
+function setHas(set, value) {
+  return set && set.has(value);
+}
+function teamIsEliminatedClient(team) {
+  if (!team) return false;
+  return (window.CLIENT_DATA?.matches || []).some(match => {
+    if (!KNOCKOUT_POINTS[match.stage] || !match.result) return false;
+    const teams = {
+      a: slotTeamSet(match.team_a),
+      b: slotTeamSet(match.team_b)
+    };
+    const all = new Set([...teams.a, ...teams.b]);
+    if (!all.has(team)) return false;
+    const winner = match.result === 'A_WIN' ? teams.a : teams.b;
+    return !winner.has(team);
+  });
+}
+function refreshUserKnockoutBracketFlags() {
+  const byId = matchById();
+  const predMap = predictionMap();
+  document.querySelectorAll('.mini-flag-pick[data-ko-team]').forEach(flag => {
+    const team = flag.dataset.koTeam;
+    const match = byId.get(flag.dataset.koMatchId || '');
+    const isStarter = flag.dataset.koStarter === '1';
+    flag.classList.remove('earned', 'lost', 'eliminated');
+    if (match?.result) {
+      const teams = {
+        a: slotTeamSet(match.team_a, byId),
+        b: slotTeamSet(match.team_b, byId)
+      };
+      const all = new Set([...teams.a, ...teams.b]);
+      const winner = match.result === 'A_WIN' ? teams.a : teams.b;
+      if (all.has(team) && !winner.has(team)) flag.classList.add('lost');
+      const prediction = predMap.get(`${flag.dataset.userId}:${match.match_id}`);
+      const canShowEarned = isStarter || match.stage !== 'R32';
+      if (canShowEarned && prediction?.predicted_team === team && prediction?.prediction === match.result && winner.has(team)) {
+        flag.classList.add('earned');
+      }
+    }
+    if (!isStarter && teamIsEliminatedClient(team)) flag.classList.add('eliminated');
+  });
+}
 function updateClientMatchCard(match) {
   const card = document.querySelector(`.match-card[data-match-id="${match.match_id}"]`);
   if (!card) return;
@@ -683,6 +725,7 @@ function updateClientMatchCard(match) {
     }
   });
   updateClientPickPoints(match);
+  refreshUserKnockoutBracketFlags();
   applyMatchSpoilers();
 }
 async function fetchClientResults() {
@@ -724,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
   showTab(document.getElementById(initial) ? initial : 'knockout-tab');
   refreshKnockoutCurrentDay();
   applyMatchSpoilers();
+  refreshUserKnockoutBracketFlags();
   applyLeaderboardSpoilerMode();
   fetchClientResults();
   window.setInterval(fetchClientResults, 5 * 60 * 1000);
@@ -1324,7 +1368,7 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
                     _earned_pick_class(match, prediction, team, matches_by_id),
                     _lost_pick_class(match, team, matches_by_id),
                 ]))
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=flag_state, mark_eliminated=False))
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=flag_state, mark_eliminated=False, user_id=user_id, match_id=match_id, starter=True))
             for match_id, col, row, span in layout:
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
@@ -1334,14 +1378,14 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
                     earned_class,
                     _lost_pick_class(match, team, matches_by_id),
                 ]))
-                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=flag_state))
+                flags.append(_mini_ko_flag(team, matches_by_id, style=f"grid-column:{col};grid-row:{row} / span {span};", extra_class=flag_state, user_id=user_id, match_id=match_id))
             champion = prediction_rows_by_user_match.get((user_id, "K104"), {}).get("predicted_team")
             third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("predicted_team")
             other_third = prediction_rows_by_user_match.get((user_id, "K103"), {}).get("third_place_other")
             center = (
                 f'<div class="user-ko-title">{escape(user["display_name"])}\'s Bracket</div>'
-                f'<div class="user-ko-center"><div class="user-ko-cup">&#127942;</div><div class="user-ko-champion">{_mini_ko_flag(champion, matches_by_id, extra_class="champion")}</div><div>Champion</div></div>'
-                f'<div class="user-ko-third">{_mini_ko_flag(third, matches_by_id)}{_mini_ko_flag(other_third, matches_by_id)}</div>'
+                f'<div class="user-ko-center"><div class="user-ko-cup">&#127942;</div><div class="user-ko-champion">{_mini_ko_flag(champion, matches_by_id, extra_class="champion", user_id=user_id, match_id="K104")}</div><div>Champion</div></div>'
+                f'<div class="user-ko-third">{_mini_ko_flag(third, matches_by_id, user_id=user_id, match_id="K103")}{_mini_ko_flag(other_third, matches_by_id, user_id=user_id, match_id="K103")}</div>'
             )
             body = f'<div class="user-ko-board">{"".join(flags)}{center}</div>'
         sections.append(f'''<details class="panel user-ko-bracket">
@@ -1371,12 +1415,13 @@ def _lost_pick_class(match, team, matches_by_id):
     return "" if team in winner else "lost"
 
 
-def _mini_ko_flag(team, matches_by_id, style='', extra_class='', mark_eliminated=True):
+def _mini_ko_flag(team, matches_by_id, style='', extra_class='', mark_eliminated=True, user_id='', match_id='', starter=False):
     if not team:
         return f'<span class="mini-flag-pick blank {escape(extra_class)}" style="{escape(style)}"></span>'
     eliminated = ' eliminated' if mark_eliminated and _team_is_eliminated(team, matches_by_id) else ''
     class_attr = f'mini-flag-pick {escape(extra_class)}{eliminated}'
-    return f'<span class="{class_attr}" style="{escape(style)}" title="{escape(team)}">{_flag_img(team, "Pick")}</span>'
+    starter_attr = ' data-ko-starter="1"' if starter else ''
+    return f'<span class="{class_attr}" style="{escape(style)}" title="{escape(team)}" data-user-id="{escape(user_id)}" data-ko-match-id="{escape(match_id)}" data-ko-team="{escape(team)}"{starter_attr}>{_flag_img(team, "Pick")}</span>'
 
 
 def _team_is_eliminated(team, matches_by_id):

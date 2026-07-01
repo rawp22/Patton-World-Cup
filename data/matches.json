@@ -1002,9 +1002,9 @@
     "team_b": "Sweden",
     "venue": "MetLife Stadium, New York/New Jersey",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 0,
     "kickoff_et": "17:00 ET"
   },
   {
@@ -1030,9 +1030,9 @@
     "team_b": "Ecuador",
     "venue": "Estadio Azteca, Mexico City",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 0,
     "kickoff_et": "22:00 ET"
   },
   {
