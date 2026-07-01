@@ -336,6 +336,38 @@ function applyMatchSpoilers() {
     setMatchRevealState(card, autoRevealed, autoRevealed);
   });
 }
+function easternTodayISO() {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone:'America/New_York',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).formatToParts(new Date());
+    const byType = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${byType.year}-${byType.month}-${byType.day}`;
+  } catch (_) {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+function refreshKnockoutCurrentDay() {
+  const today = easternTodayISO();
+  document.querySelectorAll('#knockout-tab .match-card.today-match').forEach(card => card.classList.remove('today-match'));
+  document.querySelectorAll('#knockout-tab .match-card[data-match-date]').forEach(card => {
+    if (card.dataset.matchDate === today) card.classList.add('today-match');
+  });
+  const dateSections = Array.from(document.querySelectorAll('.knockout-date[data-knockout-date]'));
+  let firstVisible = null;
+  dateSections.forEach(section => {
+    const isPast = section.dataset.knockoutDate < today;
+    section.hidden = isPast;
+    if (isPast) section.open = false;
+    else if (!firstVisible) firstVisible = section;
+  });
+  dateSections.forEach(section => {
+    if (!section.hidden) section.open = section === firstVisible;
+  });
+}
 function toggleMatch(card) {
   if (!card) return;
   const reveal = card.classList.contains('spoiler-hidden');
@@ -690,6 +722,7 @@ function shouldClientFetchMatch(match, now) {
 document.addEventListener('DOMContentLoaded', () => {
   const initial = window.location.hash ? window.location.hash.slice(1) : 'knockout-tab';
   showTab(document.getElementById(initial) ? initial : 'knockout-tab');
+  refreshKnockoutCurrentDay();
   applyMatchSpoilers();
   applyLeaderboardSpoilerMode();
   fetchClientResults();
@@ -984,7 +1017,7 @@ def _knockout_date_schedule(matches, groups):
             )
         open_attr = " open" if index == 0 else ""
         sections.append(
-            f'<details class="knockout-date"{open_attr}><summary>{escape(_display_date(date))}</summary><div class="knockout-date-list">{"".join(rows)}</div></details>'
+            f'<details class="knockout-date"{open_attr} data-knockout-date="{escape(date)}"><summary>{escape(_display_date(date))}</summary><div class="knockout-date-list">{"".join(rows)}</div></details>'
         )
     return f'''<section class="knockout-schedule panel">
   <div class="section-heading"><h2>Knockout Match Days</h2><span>Upcoming dates disappear after the final game that day is complete</span></div>
@@ -1122,7 +1155,7 @@ def _match_card(match, impacts, leaderboard_order, show_group_report=False, grou
         classes.append("today-match")
     card_class = " ".join(classes)
     teams_html = f'<span class="default-teams">{escape(default_teams)}</span><span class="live-teams">{escape(live_teams)}</span>'
-    return f"""<details class="{card_class}" data-match-id="{escape(match["match_id"])}" data-result="{result_attr}" data-reveal-at="{reveal_attr}">
+    return f"""<details class="{card_class}" data-match-id="{escape(match["match_id"])}" data-match-date="{escape(match["date"])}" data-result="{result_attr}" data-reveal-at="{reveal_attr}">
   <summary><span class="stage">{stage}</span><span class="teams">{teams_html}</span><span class="result">{result_html}</span></summary>
   <div class="impact">
     {venue}
