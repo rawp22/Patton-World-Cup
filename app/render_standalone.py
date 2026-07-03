@@ -575,6 +575,33 @@ function winnerTeamSet(match) {
   if (match.result === 'B_WIN') return slotTeamSet(match.team_b);
   return null;
 }
+function resolvedClientSlotLabel(slot, byId=matchById()) {
+  const teams = [...slotTeamSet(slot, byId)];
+  return teams.length === 1 ? teams[0] : slot;
+}
+function resolvedClientMatch(match, byId=matchById()) {
+  return {
+    ...match,
+    team_a: resolvedClientSlotLabel(match.team_a, byId),
+    team_b: resolvedClientSlotLabel(match.team_b, byId)
+  };
+}
+function refreshKnockoutFeederLabels() {
+  const byId = matchById();
+  document.querySelectorAll('#knockout-tab .match-card[data-match-id]').forEach(card => {
+    const match = byId.get(card.dataset.matchId || '');
+    if (!match) return;
+    const resolved = resolvedClientMatch(match, byId);
+    const defaultTeams = card.querySelector('.default-teams');
+    const liveTeams = card.querySelector('.live-teams');
+    if (defaultTeams) defaultTeams.textContent = `${resolved.team_a} vs ${resolved.team_b}`;
+    if (liveTeams && !match.result) liveTeams.textContent = `${resolved.team_a} vs ${resolved.team_b}`;
+    card.querySelectorAll('.impact-head[data-scenario]').forEach(head => {
+      if (head.dataset.scenario === 'A_WIN') head.textContent = `${resolved.team_a} wins`;
+      if (head.dataset.scenario === 'B_WIN') head.textContent = `${resolved.team_b} wins`;
+    });
+  });
+}
 function pickedTeamCanScore(match, predictedTeam) {
   if (!predictedTeam || !KNOCKOUT_POINTS[match.stage]) return true;
   const winners = winnerTeamSet(match);
@@ -725,6 +752,7 @@ function updateClientMatchCard(match) {
     }
   });
   updateClientPickPoints(match);
+  refreshKnockoutFeederLabels();
   refreshUserKnockoutBracketFlags();
   applyMatchSpoilers();
 }
@@ -766,6 +794,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const initial = window.location.hash ? window.location.hash.slice(1) : 'knockout-tab';
   showTab(document.getElementById(initial) ? initial : 'knockout-tab');
   refreshKnockoutCurrentDay();
+  refreshKnockoutFeederLabels();
   applyMatchSpoilers();
   refreshUserKnockoutBracketFlags();
   applyLeaderboardSpoilerMode();
