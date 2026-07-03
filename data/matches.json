@@ -1045,8 +1045,8 @@
     "venue": "Mercedes-Benz Stadium, Atlanta",
     "round_points": 3,
     "result": "A_WIN",
-    "goals_a": null,
-    "goals_b": null,
+    "goals_a": 2,
+    "goals_b": 1,
     "kickoff_et": "12:00 ET"
   },
   {
@@ -1058,9 +1058,9 @@
     "team_b": "Bosnia and Herzegovina",
     "venue": "Levi's Stadium, San Francisco Bay Area",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 0,
     "kickoff_et": "20:00 ET"
   },
   {
@@ -1072,10 +1072,11 @@
     "team_b": "Senegal",
     "venue": "Lumen Field, Seattle",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
-    "kickoff_et": "16:00 ET"
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 2,
+    "kickoff_et": "16:00 ET",
+    "result_note": "Belgium wins in extra time"
   },
   {
     "match_id": "K083",
@@ -1086,9 +1087,9 @@
     "team_b": "Croatia",
     "venue": "BMO Field, Toronto",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 1,
     "kickoff_et": "19:00 ET"
   },
   {
@@ -1100,9 +1101,9 @@
     "team_b": "Austria",
     "venue": "SoFi Stadium, Los Angeles",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 0,
     "kickoff_et": "15:00 ET"
   },
   {
@@ -1114,9 +1115,9 @@
     "team_b": "Algeria",
     "venue": "BC Place, Vancouver",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 0,
     "kickoff_et": "23:00 ET"
   },
   {
