@@ -153,7 +153,7 @@ def score_match_for_user(
             points["group_points"] += 1
             explanations.append("Correct group result (+1)")
     elif match["stage"] in KNOCKOUT_POINTS:
-        if predicted_result == result:
+        if predicted_result == result and _predicted_team_matches_winner(predicted_team, winner_team_set):
             amount = KNOCKOUT_POINTS[match["stage"]]
             points["knockout_points"] += amount
             explanations.append(f"Correct {match['stage']} winner (+{amount})")
