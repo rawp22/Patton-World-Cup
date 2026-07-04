@@ -1169,12 +1169,12 @@
     "date": "2026-07-04",
     "team_a": "W74",
     "team_b": "W77",
-    "venue": "NRG Stadium, Houston",
+    "venue": "Lincoln Financial Field, Philadelphia",
     "round_points": 5,
     "result": null,
     "goals_a": null,
     "goals_b": null,
-    "kickoff_et": "13:00 ET"
+    "kickoff_et": "17:00 ET"
   },
   {
     "match_id": "K090",
@@ -1183,12 +1183,12 @@
     "date": "2026-07-04",
     "team_a": "W73",
     "team_b": "W75",
-    "venue": "Lincoln Financial Field, Philadelphia",
+    "venue": "NRG Stadium, Houston",
     "round_points": 5,
     "result": null,
     "goals_a": null,
     "goals_b": null,
-    "kickoff_et": "17:00 ET"
+    "kickoff_et": "13:00 ET"
   },
   {
     "match_id": "K091",
