@@ -1129,9 +1129,9 @@
     "team_b": "Cape Verde",
     "venue": "Hard Rock Stadium, Miami",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 2,
     "kickoff_et": "18:00 ET"
   },
   {
@@ -1143,9 +1143,9 @@
     "team_b": "Ghana",
     "venue": "GEHA Field at Arrowhead Stadium, Kansas City",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 1,
+    "goals_b": 0,
     "kickoff_et": "21:30 ET"
   },
   {
@@ -1157,10 +1157,11 @@
     "team_b": "Egypt",
     "venue": "AT&T Stadium, Dallas",
     "round_points": 3,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
-    "kickoff_et": "14:00 ET"
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 1,
+    "kickoff_et": "14:00 ET",
+    "result_note": "Egypt wins on PKs"
   },
   {
     "match_id": "K089",
