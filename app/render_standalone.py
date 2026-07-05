@@ -624,8 +624,8 @@ function scoreForUser(match, user, predicted) {
   }
   const resolvedWinners = winnerTeamSet(match);
   const winner = resolvedWinners && resolvedWinners.size === 1 ? [...resolvedWinners][0] : winnerFor(match);
-  if (user.dark_horse && teamInMatch(match, user.dark_horse)) {
-    if (match.stage === 'group') {
+  if (user.dark_horse) {
+    if (match.stage === 'group' && teamInMatch(match, user.dark_horse)) {
       if (winner === user.dark_horse) points.dark_horse_points += 3;
       else if (match.result === 'DRAW') points.dark_horse_points += 1;
     } else if (KNOCKOUT_POINTS[match.stage] && winner === user.dark_horse) {

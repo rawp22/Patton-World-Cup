@@ -158,10 +158,10 @@ def score_match_for_user(
             points["knockout_points"] += amount
             explanations.append(f"Correct {match['stage']} winner (+{amount})")
 
-    winner = _winner_for_match(match)
+    winner = _resolved_winner_for_match(match, winner_team_set)
     dark_horse = user.get("dark_horse")
-    if dark_horse and _team_in_match(match, dark_horse):
-        if match["stage"] == "group":
+    if dark_horse:
+        if match["stage"] == "group" and _team_in_match(match, dark_horse):
             if winner == dark_horse:
                 points["dark_horse_points"] += 3
                 explanations.append("Dark horse group win (+3)")
