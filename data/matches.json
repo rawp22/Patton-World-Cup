@@ -1171,9 +1171,9 @@
     "team_b": "W77",
     "venue": "Lincoln Financial Field, Philadelphia",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 0,
+    "goals_b": 1,
     "kickoff_et": "17:00 ET"
   },
   {
@@ -1185,9 +1185,9 @@
     "team_b": "W75",
     "venue": "NRG Stadium, Houston",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 0,
+    "goals_b": 3,
     "kickoff_et": "13:00 ET"
   },
   {
