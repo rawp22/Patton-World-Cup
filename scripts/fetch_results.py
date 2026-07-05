@@ -193,12 +193,14 @@ def fixture_result_for_match(match: dict, fixtures: list[dict]) -> dict | None:
 
 def should_check_match(match: dict, now: datetime) -> bool:
     elapsed_minutes = (now - kickoff_dt(match)).total_seconds() / 60
-    if match.get("stage") not in KNOCKOUT_STAGES:
-        return elapsed_minutes >= 120
-    return any(
-        offset <= elapsed_minutes < offset + FETCH_WINDOW_MINUTES
-        for offset in KNOCKOUT_FETCH_OFFSETS_MINUTES
-    )
+    if elapsed_minutes < 120:
+        return False
+    if match.get("stage") in KNOCKOUT_STAGES:
+        # GitHub scheduled workflows can run late or skip exact five-minute windows.
+        # Once a knockout match reaches the result-check window, keep checking it
+        # every run until a final winner is found.
+        return True
+    return True
 
 
 def pending_dates(matches: list[dict], now: datetime) -> dict[str, list[dict]]:
