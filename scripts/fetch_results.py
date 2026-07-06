@@ -65,6 +65,28 @@ def get_json(url: str, api_key: str = "") -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+def resolved_slot(slot: str | None, matches_by_id: dict[str, dict]) -> str | None:
+    if not slot:
+        return slot
+    if len(slot) >= 2 and slot[0] in {"W", "L"} and slot[1:].isdigit():
+        source = matches_by_id.get(f"K{int(slot[1:]):03d}")
+        if not source or not source.get("result"):
+            return slot
+        if slot[0] == "W":
+            source_slot = source.get("team_a") if source.get("result") == "A_WIN" else source.get("team_b")
+        else:
+            source_slot = source.get("team_b") if source.get("result") == "A_WIN" else source.get("team_a")
+        return resolved_slot(source_slot, matches_by_id)
+    return slot
+
+
+def match_for_score_lookup(match: dict, matches_by_id: dict[str, dict]) -> dict:
+    lookup = dict(match)
+    lookup["team_a"] = resolved_slot(match.get("team_a"), matches_by_id)
+    lookup["team_b"] = resolved_slot(match.get("team_b"), matches_by_id)
+    return lookup
+
+
 def espn_fixture_result_for_match(match: dict, events: list[dict]) -> dict | None:
     team_a_keys = team_keys(match["team_a"])
     team_b_keys = team_keys(match["team_b"])
@@ -231,6 +253,7 @@ def fetch_espn_events(date: str) -> list[dict]:
 def update_results() -> int:
     api_key = os.environ.get("API_FOOTBALL_KEY")
     matches = json.loads(MATCHES_PATH.read_text(encoding="utf-8"))
+    matches_by_id = {match["match_id"]: match for match in matches}
     now = now_dt()
     dates = pending_dates(matches, now)
     if not dates:
@@ -251,10 +274,11 @@ def update_results() -> int:
             f"for {len(date_matches)} pending matches."
         )
         for match in date_matches:
-            result = espn_fixture_result_for_match(match, espn_events)
+            lookup_match = match_for_score_lookup(match, matches_by_id)
+            result = espn_fixture_result_for_match(lookup_match, espn_events)
             source = "ESPN"
             if not result and fixtures:
-                result = fixture_result_for_match(match, fixtures)
+                result = fixture_result_for_match(lookup_match, fixtures)
                 source = "API-Football"
             if not result:
                 continue
@@ -268,7 +292,8 @@ def update_results() -> int:
             updated += 1
             print(
                 f"Updated {match['match_id']} from {source}: "
-                f"{match['team_a']} {match['goals_a']}-{match['goals_b']} {match['team_b']} ({match['result']})"
+                f"{lookup_match['team_a']} {match['goals_a']}-{match['goals_b']} "
+                f"{lookup_match['team_b']} ({match['result']})"
             )
 
     if updated:

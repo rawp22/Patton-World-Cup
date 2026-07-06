@@ -785,8 +785,9 @@ async function fetchClientResults() {
     let events = [];
     try { events = await fetchEspnDate(date); } catch (_) { events = []; }
     pending.filter(match => espnLookupDates(match).includes(date)).forEach(match => {
+      const lookupMatch = resolvedClientMatch(match, matchById());
       for (const event of events) {
-        const result = resultFromEspnEvent(match, event);
+        const result = resultFromEspnEvent(lookupMatch, event);
         if (!result) continue;
         Object.assign(match, result);
         updateClientMatchCard(match);
