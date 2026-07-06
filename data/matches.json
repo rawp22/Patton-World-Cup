@@ -1214,9 +1214,9 @@
     "team_b": "W80",
     "venue": "Estadio Azteca, Mexico City",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 2,
+    "goals_b": 3,
     "kickoff_et": "20:00 ET"
   },
   {
