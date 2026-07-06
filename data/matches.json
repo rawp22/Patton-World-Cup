@@ -1228,9 +1228,9 @@
     "team_b": "W84",
     "venue": "AT&T Stadium, Dallas",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 0,
+    "goals_b": 1,
     "kickoff_et": "15:00 ET"
   },
   {
