@@ -705,6 +705,23 @@ function teamIsEliminatedClient(team) {
     return !winner.has(team);
   });
 }
+function earnedForMatchEntry(match, userId, team, predMap, byId) {
+  if (!match?.result || !team) return false;
+  const prediction = predMap.get(`${userId}:${match.match_id}`);
+  if (prediction?.predicted_team !== team || prediction?.prediction !== match.result) return false;
+  const teams = {
+    a: slotTeamSet(match.team_a, byId),
+    b: slotTeamSet(match.team_b, byId)
+  };
+  const winner = match.result === 'A_WIN' ? teams.a : teams.b;
+  return winner.has(team);
+}
+function downstreamMatchesForSource(matchId, byId) {
+  const numeric = /^K0*(\d+)$/.exec(matchId || '');
+  if (!numeric) return [];
+  const winnerSlot = `W${Number(numeric[1])}`;
+  return [...byId.values()].filter(match => match.team_a === winnerSlot || match.team_b === winnerSlot);
+}
 function refreshUserKnockoutBracketFlags() {
   const byId = matchById();
   const predMap = predictionMap();
@@ -721,13 +738,14 @@ function refreshUserKnockoutBracketFlags() {
       const all = new Set([...teams.a, ...teams.b]);
       const winner = match.result === 'A_WIN' ? teams.a : teams.b;
       if (all.has(team) && !winner.has(team)) flag.classList.add('lost');
-      const prediction = predMap.get(`${flag.dataset.userId}:${match.match_id}`);
-      const canShowEarned = isStarter || match.stage !== 'R32';
-      if (canShowEarned && prediction?.predicted_team === team && prediction?.prediction === match.result && winner.has(team)) {
+      if (isStarter && earnedForMatchEntry(match, flag.dataset.userId, team, predMap, byId)) flag.classList.add('earned');
+    }
+    if (!isStarter) {
+      if (downstreamMatchesForSource(flag.dataset.koMatchId || '', byId).some(nextMatch => earnedForMatchEntry(nextMatch, flag.dataset.userId, team, predMap, byId))) {
         flag.classList.add('earned');
       }
+      if (teamIsEliminatedClient(team)) flag.classList.add('eliminated');
     }
-    if (!isStarter && teamIsEliminatedClient(team)) flag.classList.add('eliminated');
   });
 }
 function updateClientMatchCard(match) {
@@ -1402,7 +1420,7 @@ def _user_knockout_brackets(leaderboard_order, users_by_id, matches, prediction_
                 prediction = prediction_rows_by_user_match.get((user_id, match_id), {})
                 team = prediction.get("predicted_team")
                 match = matches_by_id.get(match_id, {})
-                earned_class = "" if match.get("stage") == "R32" else _earned_pick_class(match, prediction, team, matches_by_id)
+                earned_class = _earned_feeder_pick_class(match_id, prediction_rows_by_user_match, user_id, team, matches_by_id)
                 flag_state = " ".join(filter(None, [
                     earned_class,
                     _lost_pick_class(match, team, matches_by_id),
@@ -1432,6 +1450,22 @@ def _earned_pick_class(match, prediction, team, matches_by_id):
     teams = _render_match_team_sets(match, matches_by_id)
     winner = teams["a"] if match.get("result") == "A_WIN" else teams["b"]
     return "earned" if team in winner else ""
+
+
+def _earned_feeder_pick_class(source_match_id, prediction_rows_by_user_match, user_id, team, matches_by_id):
+    if not source_match_id or not team:
+        return ""
+    source_number = str(int(source_match_id[1:])) if source_match_id.startswith("K") and source_match_id[1:].isdigit() else ""
+    if not source_number:
+        return ""
+    winner_slot = f"W{source_number}"
+    for next_match in matches_by_id.values():
+        if next_match.get("team_a") != winner_slot and next_match.get("team_b") != winner_slot:
+            continue
+        prediction = prediction_rows_by_user_match.get((user_id, next_match.get("match_id")), {})
+        if _earned_pick_class(next_match, prediction, team, matches_by_id):
+            return "earned"
+    return ""
 
 
 def _lost_pick_class(match, team, matches_by_id):
