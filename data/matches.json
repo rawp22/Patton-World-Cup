@@ -1256,9 +1256,9 @@
     "team_b": "W88",
     "venue": "Mercedes-Benz Stadium, Atlanta",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 2,
     "kickoff_et": "12:00 ET"
   },
   {
