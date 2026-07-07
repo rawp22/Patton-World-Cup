@@ -1242,9 +1242,9 @@
     "team_b": "W82",
     "venue": "Lumen Field, Seattle",
     "round_points": 5,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 4,
     "kickoff_et": "20:00 ET"
   },
   {
