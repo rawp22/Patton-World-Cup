@@ -1299,9 +1299,9 @@
     "team_b": "W94",
     "venue": "SoFi Stadium, Los Angeles",
     "round_points": 8,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 2,
+    "goals_b": 1,
     "kickoff_et": "15:00 ET"
   },
   {
