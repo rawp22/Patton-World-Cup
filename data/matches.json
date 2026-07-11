@@ -1313,9 +1313,9 @@
     "team_b": "W92",
     "venue": "Hard Rock Stadium, Miami",
     "round_points": 8,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "B_WIN",
+    "goals_a": 1,
+    "goals_b": 2,
     "kickoff_et": "17:00 ET"
   },
   {
