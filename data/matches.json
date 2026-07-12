@@ -1327,9 +1327,9 @@
     "team_b": "W96",
     "venue": "GEHA Field at Arrowhead Stadium, Kansas City",
     "round_points": 8,
-    "result": null,
-    "goals_a": null,
-    "goals_b": null,
+    "result": "A_WIN",
+    "goals_a": 3,
+    "goals_b": 1,
     "kickoff_et": "21:00 ET"
   },
   {
